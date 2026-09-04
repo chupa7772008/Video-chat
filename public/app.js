@@ -30,16 +30,21 @@ async function startCamera() {
 }
 
 function connectSocket() {
-   
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+
+    socket = new WebSocket(
+        protocol + "//" + window.location.host
+    );
 
     socket.onopen = () => {
         status.textContent = "Соединение с сервером установлено ✅";
-    }
- const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    };
 
-socket = new WebSocket(
-    protocol + "//" + window.location.host
-);   socket.onmessage = async (event) => {
+    socket.onerror = () => {
+        status.textContent = "Ошибка соединения с сервером ❌";
+    };
+
+    socket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
 
         if (data.type === "connected") {
@@ -47,15 +52,17 @@ socket = new WebSocket(
         }
 
         if (data.type === "waiting") {
-            status.textContent = "Ищем собеседника... 🔎"
-;        }
+            status.textContent = "Ищем собеседника... 🔎";
+        }
 
         if (data.type === "matched") {
             status.textContent = "Собеседник найден! 🎉";
+
             await createPeerConnection();
 
             if (data.initiator) {
                 const offer = await peerConnection.createOffer();
+
                 await peerConnection.setLocalDescription(offer);
 
                 socket.send(JSON.stringify({
@@ -73,6 +80,7 @@ socket = new WebSocket(
             );
 
             const answer = await peerConnection.createAnswer();
+
             await peerConnection.setLocalDescription(answer);
 
             socket.send(JSON.stringify({
@@ -101,6 +109,7 @@ socket = new WebSocket(
 
         if (data.type === "partner_left") {
             status.textContent = "Собеседник отключился";
+
             remoteVideo.srcObject = null;
 
             if (peerConnection) {
@@ -111,7 +120,7 @@ socket = new WebSocket(
     };
 
     socket.onclose = () => {
-        status.textContent = "Соединение с сервером закрыто";
+        status.textContent = "Соединение с сервером закрыто ❌";
     };
 }
 
@@ -130,7 +139,7 @@ async function createPeerConnection() {
     };
 
     peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
+        if (event.candidate && socket) {
             socket.send(JSON.stringify({
                 type: "candidate",
                 candidate: event.candidate
@@ -140,9 +149,16 @@ async function createPeerConnection() {
 }
 
 findBtn.onclick = () => {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+        status.textContent = "Сервер ещё не подключён ❌";
+        return;
+    }
+
     socket.send(JSON.stringify({
         type: "find"
     }));
+
+    status.textContent = "Ищем собеседника... 🔎";
 };
 
 nextBtn.onclick = () => {
@@ -153,9 +169,11 @@ nextBtn.onclick = () => {
 
     remoteVideo.srcObject = null;
 
-    socket.send(JSON.stringify({
-        type: "next"
-    }));
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+            type: "next"
+        }));
+    }
 
     status.textContent = "Ищем нового собеседника... 🔎";
 };
