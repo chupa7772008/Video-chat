@@ -3,192 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Видео-рулетка</title>
+
+    <title>Видеочат 18 — видеочат с людьми со всего мира</title>
+
+    <meta
+        name="description"
+        content="Видеочат 18 — онлайн-видеочат для общения с людьми со всего мира. Найдите случайного собеседника и общайтесь по видео."
+    >
+
+    <meta
+        name="keywords"
+        content="видеочат 18, видеочат, видео чат, онлайн видеочат, случайный видеочат, чат с людьми"
+    >
+
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Видеочат 18">
+    <meta
+        property="og:description"
+        content="Онлайн-видеочат с людьми со всего мира."
+    >
+    <meta property="og:type" content="website">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: #fff;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 20px 0 5px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        .videos {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 10px;
+        }
+
+        video {
+            width: 45%;
+            max-width: 600px;
+            min-width: 300px;
+            background: #000;
+            border-radius: 12px;
+            border: 2px solid #333;
+        }
+
+        .panel {
+            width: 95%;
+            max-width: 700px;
+            margin: 15px auto;
+            padding: 20px;
+            background: #1d1d1d;
+            border-radius: 15px;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            text-align: left;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background: #2b2b2b;
+            color: white;
+            font-size: 16px;
+        }
+
+        button {
+            margin: 8px 5px;
+            padding: 13px 20px;
+            border: none;
+            border-radius: 9px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #findBtn {
+            background: #20c55a;
+            color: white;
+        }
+
+        #nextBtn {
+            background: #e09b20;
+            color: white;
+        }
+
+        #status {
+            margin: 15px 0;
+            font-size: 17px;
+        }
+
+        #partnerInfo {
+            margin: 10px 0;
+            color: #ddd;
+            font-size: 16px;
+        }
+
+        .age-warning {
+            margin-top: 20px;
+            color: #aaa;
+            font-size: 13px;
+        }
+
+        @media (max-width: 700px) {
+            video {
+                width: 100%;
+                min-width: 0;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>🎥 Видео-рулетка</h1>
+    <h1>Видеочат 18</h1>
 
-<div>
-    <video id="localVideo" autoplay muted playsinline></video>
-    <video id="remoteVideo" autoplay playsinline></video>
-</div>
+    <div class="subtitle">
+        Онлайн-видеочат с людьми со всего мира
+    </div>
 
-<p id="status">Готов к подключению</p>
+    <div class="videos">
+        <video id="localVideo" autoplay muted playsinline></video>
+        <video id="remoteVideo" autoplay playsinline></video>
+    </div>
 
-<h2>👤 Мой профиль</h2>
+    <div class="panel">
 
-<label for="countrySelect">Моя страна:</label>
-<select id="countrySelect">
+        <div id="status">
+            Подключение...
+        </div>
 
-    <option value="RU">🇷🇺 Россия</option>
-    <option value="UA">🇺🇦 Украина</option>
-    <option value="NL">🇳🇱 Нидерланды</option>
-    <option value="DE">🇩🇪 Германия</option>
-    <option value="FR">🇫🇷 Франция</option>
-    <option value="GB">🇬🇧 Великобритания</option>
-    <option value="US">🇺🇸 США</option>
-    <option value="CA">🇨🇦 Канада</option>
-    <option value="PL">🇵🇱 Польша</option>
-    <option value="KZ">🇰🇿 Казахстан</option>
-    <option value="TR">🇹🇷 Турция</option>
-    <option value="BY">🇧🇾 Беларусь</option>
-    <option value="LT">🇱🇹 Литва</option>
-    <option value="LV">🇱🇻 Латвия</option>
-    <option value="EE">🇪🇪 Эстония</option>
-    <option value="CZ">🇨🇿 Чехия</option>
-    <option value="SK">🇸🇰 Словакия</option>
-    <option value="AT">🇦🇹 Австрия</option>
-    <option value="CH">🇨🇭 Швейцария</option>
-    <option value="IT">🇮🇹 Италия</option>
-    <option value="ES">🇪🇸 Испания</option>
-    <option value="PT">🇵🇹 Португалия</option>
-    <option value="GR">🇬🇷 Греция</option>
-    <option value="SE">🇸🇪 Швеция</option>
-    <option value="NO">🇳🇴 Норвегия</option>
-    <option value="DK">🇩🇰 Дания</option>
-    <option value="FI">🇫🇮 Финляндия</option>
-    <option value="IS">🇮🇸 Исландия</option>
-    <option value="IE">🇮🇪 Ирландия</option>
-    <option value="RO">🇷🇴 Румыния</option>
-    <option value="BG">🇧🇬 Болгария</option>
-    <option value="HU">🇭🇺 Венгрия</option>
-    <option value="RS">🇷🇸 Сербия</option>
-    <option value="HR">🇭🇷 Хорватия</option>
-    <option value="SI">🇸🇮 Словения</option>
-    <option value="BA">🇧🇦 Босния и Герцеговина</option>
-    <option value="GE">🇬🇪 Грузия</option>
-    <option value="AM">🇦🇲 Армения</option>
-    <option value="AZ">🇦🇿 Азербайджан</option>
-    <option value="IL">🇮🇱 Израиль</option>
-    <option value="AE">🇦🇪 ОАЭ</option>
-    <option value="SA">🇸🇦 Саудовская Аравия</option>
-    <option value="IN">🇮🇳 Индия</option>
-    <option value="PK">🇵🇰 Пакистан</option>
-    <option value="BD">🇧🇩 Бангладеш</option>
-    <option value="CN">🇨🇳 Китай</option>
-    <option value="JP">🇯🇵 Япония</option>
-    <option value="KR">🇰🇷 Южная Корея</option>
-    <option value="TH">🇹🇭 Таиланд</option>
-    <option value="VN">🇻🇳 Вьетнам</option>
-    <option value="ID">🇮🇩 Индонезия</option>
-    <option value="MY">🇲🇾 Малайзия</option>
-    <option value="PH">🇵🇭 Филиппины</option>
-    <option value="AU">🇦🇺 Австралия</option>
-    <option value="NZ">🇳🇿 Новая Зеландия</option>
-    <option value="BR">🇧🇷 Бразилия</option>
-    <option value="MX">🇲🇽 Мексика</option>
-    <option value="AR">🇦🇷 Аргентина</option>
-    <option value="CL">🇨🇱 Чили</option>
-    <option value="CO">🇨🇴 Колумбия</option>
-    <option value="ZA">🇿🇦 Южная Африка</option>
-    <option value="EG">🇪🇬 Египет</option>
-    <option value="MA">🇲🇦 Марокко</option>
-    <option value="NG">🇳🇬 Нигерия</option>
-    <option value="KE">🇰🇪 Кения</option>
+        <label for="countrySelect">
+            Ваша страна
+        </label>
 
-</select>
+        <select id="countrySelect">
+            <option value="RU">🇷🇺 Россия</option>
+            <option value="UA">🇺🇦 Украина</option>
+            <option value="NL">🇳🇱 Нидерланды</option>
+            <option value="DE">🇩🇪 Германия</option>
+            <option value="FR">🇫🇷 Франция</option>
+            <option value="GB">🇬🇧 Великобритания</option>
+            <option value="US">🇺🇸 США</option>
+            <option value="CA">🇨🇦 Канада</option>
+            <option value="PL">🇵🇱 Польша</option>
+            <option value="KZ">🇰🇿 Казахстан</option>
+            <option value="TR">🇹🇷 Турция</option>
+            <option value="BY">🇧🇾 Беларусь</option>
+            <option value="LT">🇱🇹 Литва</option>
+            <option value="LV">🇱🇻 Латвия</option>
+            <option value="EE">🇪🇪 Эстония</option>
+            <option value="CZ">🇨🇿 Чехия</option>
+            <option value="SK">🇸🇰 Словакия</option>
+            <option value="AT">🇦🇹 Австрия</option>
+            <option value="CH">🇨🇭 Швейцария</option>
+            <option value="IT">🇮🇹 Италия</option>
+            <option value="ES">🇪🇸 Испания</option>
+            <option value="PT">🇵🇹 Португалия</option>
+            <option value="GR">🇬🇷 Греция</option>
+            <option value="SE">🇸🇪 Швеция</option>
+            <option value="NO">🇳🇴 Норвегия</option>
+            <option value="DK">🇩🇰 Дания</option>
+            <option value="FI">🇫🇮 Финляндия</option>
+            <option value="IS">🇮🇸 Исландия</option>
+            <option value="IE">🇮🇪 Ирландия</option>
+            <option value="RO">🇷🇴 Румыния</option>
+            <option value="BG">🇧🇬 Болгария</option>
+            <option value="HU">🇭🇺 Венгрия</option>
+            <option value="RS">🇷🇸 Сербия</option>
+            <option value="HR">🇭🇷 Хорватия</option>
+            <option value="SI">🇸🇮 Словения</option>
+            <option value="BA">🇧🇦 Босния и Герцеговина</option>
+            <option value="GE">🇬🇪 Грузия</option>
+            <option value="AM">🇦🇲 Армения</option>
+            <option value="AZ">🇦🇿 Азербайджан</option>
+            <option value="IL">🇮🇱 Израиль</option>
+            <option value="AE">🇦🇪 ОАЭ</option>
+            <option value="SA">🇸🇦 Саудовская Аравия</option>
+            <option value="IN">🇮🇳 Индия</option>
+            <option value="PK">🇵🇰 Пакистан</option>
+            <option value="BD">🇧🇩 Бангладеш</option>
+            <option value="CN">🇨🇳 Китай</option>
+            <option value="JP">🇯🇵 Япония</option>
+            <option value="KR">🇰🇷 Южная Корея</option>
+            <option value="TH">🇹🇭 Таиланд</option>
+            <option value="VN">🇻🇳 Вьетнам</option>
+            <option value="ID">🇮🇩 Индонезия</option>
+            <option value="MY">🇲🇾 Малайзия</option>
+            <option value="PH">🇵🇭 Филиппины</option>
+            <option value="AU">🇦🇺 Австралия</option>
+            <option value="NZ">🇳🇿 Новая Зеландия</option>
+            <option value="BR">🇧🇷 Бразилия</option>
+            <option value="MX">🇲🇽 Мексика</option>
+            <option value="AR">🇦🇷 Аргентина</option>
+            <option value="CL">🇨🇱 Чили</option>
+            <option value="CO">🇨🇴 Колумбия</option>
+            <option value="ZA">🇿🇦 ЮАР</option>
+            <option value="EG">🇪🇬 Египет</option>
+            <option value="MA">🇲🇦 Марокко</option>
+            <option value="NG">🇳🇬 Нигерия</option>
+            <option value="KE">🇰🇪 Кения</option>
+        </select>
 
-<br><br>
+        <label for="genderSelect">
+            Ваш пол
+        </label>
 
-<label for="genderSelect">Мой пол:</label>
-<select id="genderSelect">
-    <option value="male">👨 Мужчина</option>
-    <option value="female">👩 Женщина</option>
-    <option value="none">Не указывать</option>
-</select>
+        <select id="genderSelect">
+            <option value="none">Не указывать</option>
+            <option value="male">👨 Мужчина</option>
+            <option value="female">👩 Женщина</option>
+        </select>
 
-<h2>🔎 Кого искать</h2>
+        <label for="searchCountrySelect">
+            Кого ищем по стране
+        </label>
 
-<label for="searchCountrySelect">Страна собеседника:</label>
-<select id="searchCountrySelect">
+        <select id="searchCountrySelect">
+            <option value="any">🌍 Любая страна</option>
+            <option value="RU">🇷🇺 Россия</option>
+            <option value="UA">🇺🇦 Украина</option>
+            <option value="NL">🇳🇱 Нидерланды</option>
+            <option value="DE">🇩🇪 Германия</option>
+            <option value="FR">🇫🇷 Франция</option>
+            <option value="GB">🇬🇧 Великобритания</option>
+            <option value="US">🇺🇸 США</option>
+            <option value="CA">🇨🇦 Канада</option>
+            <option value="PL">🇵🇱 Польша</option>
+            <option value="KZ">🇰🇿 Казахстан</option>
+            <option value="TR">🇹🇷 Турция</option>
+            <option value="BY">🇧🇾 Беларусь</option>
+            <option value="LT">🇱🇹 Литва</option>
+            <option value="LV">🇱🇻 Латвия</option>
+            <option value="EE">🇪🇪 Эстония</option>
+            <option value="CZ">🇨🇿 Чехия</option>
+            <option value="SK">🇸🇰 Словакия</option>
+            <option value="AT">🇦🇹 Австрия</option>
+            <option value="CH">🇨🇭 Швейцария</option>
+            <option value="IT">🇮🇹 Италия</option>
+            <option value="ES">🇪🇸 Испания</option>
+            <option value="PT">🇵🇹 Португалия</option>
+            <option value="GR">🇬🇷 Греция</option>
+            <option value="SE">🇸🇪 Швеция</option>
+            <option value="NO">🇳🇴 Норвегия</option>
+            <option value="DK">🇩🇰 Дания</option>
+            <option value="FI">🇫🇮 Финляндия</option>
+            <option value="IS">🇮🇸 Исландия</option>
+            <option value="IE">🇮🇪 Ирландия</option>
+            <option value="RO">🇷🇴 Румыния</option>
+            <option value="BG">🇧🇬 Болгария</option>
+            <option value="HU">🇭🇺 Венгрия</option>
+            <option value="RS">🇷🇸 Сербия</option>
+            <option value="HR">🇭🇷 Хорватия</option>
+            <option value="SI">🇸🇮 Словения</option>
+            <option value="BA">🇧🇦 Босния и Герцеговина</option>
+            <option value="GE">🇬🇪 Грузия</option>
+            <option value="AM">🇦🇲 Армения</option>
+            <option value="AZ">🇦🇿 Азербайджан</option>
+            <option value="IL">🇮🇱 Израиль</option>
+            <option value="AE">🇦🇪 ОАЭ</option>
+            <option value="SA">🇸🇦 Саудовская Аравия</option>
+            <option value="IN">🇮🇳 Индия</option>
+            <option value="PK">🇵🇰 Пакистан</option>
+            <option value="BD">🇧🇩 Бангладеш</option>
+            <option value="CN">🇨🇳 Китай</option>
+            <option value="JP">🇯🇵 Япония</option>
+            <option value="KR">🇰🇷 Южная Корея</option>
+            <option value="TH">🇹🇭 Таиланд</option>
+            <option value="VN">🇻🇳 Вьетнам</option>
+            <option value="ID">🇮🇩 Индонезия</option>
+            <option value="MY">🇲🇾 Малайзия</option>
+            <option value="PH">🇵🇭 Филиппины</option>
+            <option value="AU">🇦🇺 Австралия</option>
+            <option value="NZ">🇳🇿 Новая Зеландия</option>
+            <option value="BR">🇧🇷 Бразилия</option>
+            <option value="MX">🇲🇽 Мексика</option>
+            <option value="AR">🇦🇷 Аргентина</option>
+            <option value="CL">🇨🇱 Чили</option>
+            <option value="CO">🇨🇴 Колумбия</option>
+            <option value="ZA">🇿🇦 ЮАР</option>
+            <option value="EG">🇪🇬 Египет</option>
+            <option value="MA">🇲🇦 Марокко</option>
+            <option value="NG">🇳🇬 Нигерия</option>
+            <option value="KE">🇰🇪 Кения</option>
+        </select>
 
-    <option value="any">🌍 Любая страна</option>
-    <option value="RU">🇷🇺 Россия</option>
-    <option value="UA">🇺🇦 Украина</option>
-    <option value="NL">🇳🇱 Нидерланды</option>
-    <option value="DE">🇩🇪 Германия</option>
-    <option value="FR">🇫🇷 Франция</option>
-    <option value="GB">🇬🇧 Великобритания</option>
-    <option value="US">🇺🇸 США</option>
-    <option value="CA">🇨🇦 Канада</option>
-    <option value="PL">🇵🇱 Польша</option>
-    <option value="KZ">🇰🇿 Казахстан</option>
-    <option value="TR">🇹🇷 Турция</option>
-    <option value="BY">🇧🇾 Беларусь</option>
-    <option value="LT">🇱🇹 Литва</option>
-    <option value="LV">🇱🇻 Латвия</option>
-    <option value="EE">🇪🇪 Эстония</option>
-    <option value="CZ">🇨🇿 Чехия</option>
-    <option value="SK">🇸🇰 Словакия</option>
-    <option value="AT">🇦🇹 Австрия</option>
-    <option value="CH">🇨🇭 Швейцария</option>
-    <option value="IT">🇮🇹 Италия</option>
-    <option value="ES">🇪🇸 Испания</option>
-    <option value="PT">🇵🇹 Португалия</option>
-    <option value="GR">🇬🇷 Греция</option>
-    <option value="SE">🇸🇪 Швеция</option>
-    <option value="NO">🇳🇴 Норвегия</option>
-    <option value="DK">🇩🇰 Дания</option>
-    <option value="FI">🇫🇮 Финляндия</option>
-    <option value="IS">🇮🇸 Исландия</option>
-    <option value="IE">🇮🇪 Ирландия</option>
-    <option value="RO">🇷🇴 Румыния</option>
-    <option value="BG">🇧🇬 Болгария</option>
-    <option value="HU">🇭🇺 Венгрия</option>
-    <option value="RS">🇷🇸 Сербия</option>
-    <option value="HR">🇭🇷 Хорватия</option>
-    <option value="SI">🇸🇮 Словения</option>
-    <option value="BA">🇧🇦 Босния и Герцеговина</option>
-    <option value="GE">🇬🇪 Грузия</option>
-    <option value="AM">🇦🇲 Армения</option>
-    <option value="AZ">🇦🇿 Азербайджан</option>
-    <option value="IL">🇮🇱 Израиль</option>
-    <option value="AE">🇦🇪 ОАЭ</option>
-    <option value="SA">🇸🇦 Саудовская Аравия</option>
-    <option value="IN">🇮🇳 Индия</option>
-    <option value="PK">🇵🇰 Пакистан</option>
-    <option value="BD">🇧🇩 Бангладеш</option>
-    <option value="CN">🇨🇳 Китай</option>
-    <option value="JP">🇯🇵 Япония</option>
-    <option value="KR">🇰🇷 Южная Корея</option>
-    <option value="TH">🇹🇭 Таиланд</option>
-    <option value="VN">🇻🇳 Вьетнам</option>
-    <option value="ID">🇮🇩 Индонезия</option>
-    <option value="MY">🇲🇾 Малайзия</option>
-    <option value="PH">🇵🇭 Филиппины</option>
-    <option value="AU">🇦🇺 Австралия</option>
-    <option value="NZ">🇳🇿 Новая Зеландия</option>
-    <option value="BR">🇧🇷 Бразилия</option>
-    <option value="MX">🇲🇽 Мексика</option>
-    <option value="AR">🇦🇷 Аргентина</option>
-    <option value="CL">🇨🇱 Чили</option>
-    <option value="CO">🇨🇴 Колумбия</option>
-    <option value="ZA">🇿🇦 Южная Африка</option>
-    <option value="EG">🇪🇬 Египет</option>
-    <option value="MA">🇲🇦 Марокко</option>
-    <option value="NG">🇳🇬 Нигерия</option>
-    <option value="KE">🇰🇪 Кения</option>
+        <label for="searchGenderSelect">
+            Кого ищем по полу
+        </label>
 
-</select>
+        <select id="searchGenderSelect">
+            <option value="any">👥 Любой пол</option>
+            <option value="male">👨 Мужчина</option>
+            <option value="female">👩 Женщина</option>
+            <option value="none">Пол не указан</option>
+        </select>
 
-<br><br>
+        <div id="partnerInfo">
+            Собеседник ещё не найден
+        </div>
 
-<label for="searchGenderSelect">Пол собеседника:</label>
-<select id="searchGenderSelect">
-    <option value="any">👥 Любой</option>
-    <option value="male">👨 Мужчина</option>
-    <option value="female">👩 Женщина</option>
-    <option value="none">Не указан</option>
-</select>
+        <div>
+            <button id="findBtn">
+                🔎 Найти собеседника
+            </button>
 
-<p id="partnerInfo">Собеседник ещё не найден</p>
+            <button id="nextBtn">
+                ⏭️ Следующий
+            </button>
+        </div>
 
-<button id="findBtn">🎥 Найти собеседника</button>
-<button id="nextBtn">➡️ Следующий</button>
-<button id="testBtn">🧪 Тест соединения</button>
+        <div class="age-warning">
+            🔞 Видеочат 18 предназначен только для совершеннолетних пользователей.
+        </div>
 
-<script src="app.js"></script>
+    </div>
+
+    <script src="app.js"></script>
 
 </body>
-</html>	
+</html>
