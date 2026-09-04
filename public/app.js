@@ -38,7 +38,11 @@ function connectSocket() {
         status.textContent = "Соединение с сервером установлено ✅";
     };
 
-    socket.onmessage = async (event) => {
+ const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+
+socket = new WebSocket(
+    protocol + "//" + window.location.host
+);   socket.onmessage = async (event) => {
         const data = JSON.parse(event.data);
 
         if (data.type === "connected") {
