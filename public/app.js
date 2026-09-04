@@ -238,5 +238,11 @@ nextBtn.onclick = () => {
 };
 
 
+const privateBtn = document.getElementById("privateBtn");
+
+privateBtn.onclick = () => {
+    alert("🔒 Приватная сессия будет доступна после оплаты.");
+};
+
 startCamera();
 connectSocket();
