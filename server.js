@@ -1,3 +1,4 @@
+
 const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
@@ -28,70 +29,47 @@ function removeWaiting(ws) {
 function findPartner(ws) {
     removeWaiting(ws);
 
-    while (waiting.length > 0) {
-        const partner = waiting.shift();
-
-        if (
-            partner.readyState === WebSocket.OPEN &&
-            partner !== ws
-        ) {
-            ws.partner = partner;
-            partner.partner = ws;
-
-            send(ws, {
-                type: "matched",
-                initiator: true
-            });
-
-            send(partner, {
-                type: "matched",
-                initiator: false
-            });
-
-            console.log("Пара найдена");
-
-            return;
-        }
+    if (waiting.length === 0) {
+        waiting.push(ws);
+        send(ws, {
+            type: "waiting"
+        });
+        return;
     }
 
-    waiting.push(ws);
+    const partner = waiting.shift();
 
     send(ws, {
-        type: "waiting"
+        type: "matched",
+        initiator: true
     });
 
-    console.log("Пользователь ожидает");
+    send(partner, {
+        type: "matched",
+        initiator: false
+    });
+
+    ws.partner = partner;
+    partner.partner = ws;
 }
 
 wss.on("connection", (ws) => {
-
-    console.log("Новый пользователь подключился");
-
-    ws.partner = null;
-
     send(ws, {
         type: "connected"
     });
 
     ws.on("message", (message) => {
-
         try {
-
-            const data = JSON.parse(message.toString());
+            const data = JSON.parse(message);
 
             if (data.type === "find") {
                 findPartner(ws);
-                return;
             }
 
             if (data.type === "next") {
-
                 const partner = ws.partner;
 
-                ws.partner = null;
-
                 if (partner) {
-
                     partner.partner = null;
 
                     send(partner, {
@@ -99,9 +77,9 @@ wss.on("connection", (ws) => {
                     });
                 }
 
-                findPartner(ws);
+                ws.partner = null;
 
-                return;
+                findPartner(ws);
             }
 
             if (
@@ -109,48 +87,35 @@ wss.on("connection", (ws) => {
                 data.type === "answer" ||
                 data.type === "candidate"
             ) {
-
                 if (ws.partner) {
                     send(ws.partner, data);
                 }
             }
-
         } catch (error) {
-
-            console.log(
-                "Ошибка:",
-                error.message
-            );
+            console.error("Ошибка сообщения:", error);
         }
     });
 
     ws.on("close", () => {
-
         removeWaiting(ws);
 
         if (ws.partner) {
-
             const partner = ws.partner;
 
-            ws.partner = null;
             partner.partner = null;
 
             send(partner, {
                 type: "partner_left"
             });
         }
-
-        console.log("Пользователь отключился");
     });
 });
 
-server.listen(3000, "0.0.0.0", () => {
+const PORT = process.env.PORT || 3000;
 
-    console.log("");
+server.listen(PORT, "0.0.0.0", () => {
     console.log("==============================");
     console.log("ВИДЕО-РУЛЕТКА ЗАПУЩЕНА");
     console.log("==============================");
-    console.log("Порт: 3000");
-    console.log("");
+    console.log("Порт:", PORT);
 });
-
