@@ -26,6 +26,38 @@
         content="Онлайн-видеочат с людьми со всего мира."
     >
     <meta property="og:type" content="website">
+.video-box {
+    position: relative;
+}
+
+.video-controls {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 12px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    z-index: 10;
+}
+
+.video-controls button {
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.65);
+    color: white;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.video-controls button:active {
+    transform: scale(0.92);
+}
 
     <style>
         * {
@@ -150,10 +182,24 @@
         Онлайн-видеочат с людьми со всего мира
     </div>
 
-    <div class="videos">
+<div class="videos">
+
+    <div class="video-box">
         <video id="localVideo" autoplay muted playsinline></video>
+
+        <div class="video-controls">
+            <button id="cameraBtn">📹</button>
+            <button id="micBtn">🎤</button>
+            <button id="soundBtn">🔊</button>
+            <button id="flipBtn">🔄</button>
+        </div>
+    </div>
+
+    <div class="video-box">
         <video id="remoteVideo" autoplay playsinline></video>
     </div>
+
+</div>
 
     <div class="panel">
 
