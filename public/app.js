@@ -3,7 +3,7 @@ const remoteVideo = document.getElementById("remoteVideo");
 const status = document.getElementById("status");
 const findBtn = document.getElementById("findBtn");
 const nextBtn = document.getElementById("nextBtn");
-
+const testBtn = document.getElementById("testBtn");
 let localStream;
 let peerConnection;
 let socket;
@@ -176,6 +176,20 @@ nextBtn.onclick = () => {
     }
 
     status.textContent = "Ищем нового собеседника... 🔎";
+};
+testBtn.onclick = () => {
+    if (!socket) {
+        status.textContent = "❌ WebSocket не создан";
+        return;
+    }
+
+    if (socket.readyState === WebSocket.OPEN) {
+        status.textContent = "🟢 WebSocket работает! Соединение активно.";
+    } else if (socket.readyState === WebSocket.CONNECTING) {
+        status.textContent = "🟡 WebSocket подключается...";
+    } else {
+        status.textContent = "🔴 WebSocket не подключён.";
+    }
 };
 
 startCamera();
