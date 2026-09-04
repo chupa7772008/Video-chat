@@ -4,6 +4,13 @@ const status = document.getElementById("status");
 const findBtn = document.getElementById("findBtn");
 const nextBtn = document.getElementById("nextBtn");
 const testBtn = document.getElementById("testBtn");
+
+const countrySelect = document.getElementById("countrySelect");
+const genderSelect = document.getElementById("genderSelect");
+const searchCountrySelect = document.getElementById("searchCountrySelect");
+const searchGenderSelect = document.getElementById("searchGenderSelect");
+const partnerInfo = document.getElementById("partnerInfo");
+
 let localStream;
 let peerConnection;
 let socket;
@@ -12,6 +19,25 @@ const config = {
     iceServers: [
         { urls: "stun:stun.l.google.com:19302" }
     ]
+};
+
+const countryNames = {
+    NL: "🇳🇱 Нидерланды",
+    RU: "🇷🇺 Россия",
+    UA: "🇺🇦 Украина",
+    DE: "🇩🇪 Германия",
+    FR: "🇫🇷 Франция",
+    US: "🇺🇸 США",
+    GB: "🇬🇧 Великобритания",
+    PL: "🇵🇱 Польша",
+    KZ: "🇰🇿 Казахстан",
+    TR: "🇹🇷 Турция"
+};
+
+const genderNames = {
+    male: "👨 Мужчина",
+    female: "👩 Женщина",
+    none: "Пол не указан"
 };
 
 async function startCamera() {
@@ -30,7 +56,8 @@ async function startCamera() {
 }
 
 function connectSocket() {
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const protocol =
+        window.location.protocol === "https:" ? "wss:" : "ws:";
 
     socket = new WebSocket(
         protocol + "//" + window.location.host
@@ -58,10 +85,24 @@ function connectSocket() {
         if (data.type === "matched") {
             status.textContent = "Собеседник найден! 🎉";
 
+            if (data.partner) {
+                const country =
+                    countryNames[data.partner.country] ||
+                    "🌍 Страна не указана";
+
+                const gender =
+                    genderNames[data.partner.gender] ||
+                    "Пол не указан";
+
+                partnerInfo.textContent =
+                    `${country} · ${gender}`;
+            }
+
             await createPeerConnection();
 
             if (data.initiator) {
-                const offer = await peerConnection.createOffer();
+                const offer =
+                    await peerConnection.createOffer();
 
                 await peerConnection.setLocalDescription(offer);
 
@@ -79,7 +120,8 @@ function connectSocket() {
                 new RTCSessionDescription(data.offer)
             );
 
-            const answer = await peerConnection.createAnswer();
+            const answer =
+                await peerConnection.createAnswer();
 
             await peerConnection.setLocalDescription(answer);
 
@@ -110,6 +152,9 @@ function connectSocket() {
         if (data.type === "partner_left") {
             status.textContent = "Собеседник отключился";
 
+            partnerInfo.textContent =
+                "Собеседник ещё не найден";
+
             remoteVideo.srcObject = null;
 
             if (peerConnection) {
@@ -120,7 +165,8 @@ function connectSocket() {
     };
 
     socket.onclose = () => {
-        status.textContent = "Соединение с сервером закрыто ❌";
+        status.textContent =
+            "Соединение с сервером закрыто ❌";
     };
 }
 
@@ -135,7 +181,8 @@ async function createPeerConnection() {
 
     peerConnection.ontrack = (event) => {
         remoteVideo.srcObject = event.streams[0];
-        status.textContent = "🎉 Вы подключены к собеседнику!";
+        status.textContent =
+            "🎉 Вы подключены к собеседнику!";
     };
 
     peerConnection.onicecandidate = (event) => {
@@ -150,15 +197,24 @@ async function createPeerConnection() {
 
 findBtn.onclick = () => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
-        status.textContent = "Сервер ещё не подключён ❌";
+        status.textContent =
+            "Сервер ещё не подключён ❌";
         return;
     }
 
+    partnerInfo.textContent =
+        "Ищем собеседника... 🔎";
+
     socket.send(JSON.stringify({
-        type: "find"
+        type: "find",
+        country: countrySelect.value,
+        gender: genderSelect.value,
+        searchCountry: searchCountrySelect.value,
+        searchGender: searchGenderSelect.value
     }));
 
-    status.textContent = "Ищем собеседника... 🔎";
+    status.textContent =
+        "Ищем подходящего собеседника... 🔎";
 };
 
 nextBtn.onclick = () => {
@@ -169,26 +225,35 @@ nextBtn.onclick = () => {
 
     remoteVideo.srcObject = null;
 
+    partnerInfo.textContent =
+        "Ищем нового собеседника... 🔎";
+
     if (socket && socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify({
             type: "next"
         }));
     }
 
-    status.textContent = "Ищем нового собеседника... 🔎";
+    status.textContent =
+        "Ищем нового собеседника... 🔎";
 };
+
 testBtn.onclick = () => {
     if (!socket) {
-        status.textContent = "❌ WebSocket не создан";
+        status.textContent =
+            "❌ WebSocket не создан";
         return;
     }
 
     if (socket.readyState === WebSocket.OPEN) {
-        status.textContent = "🟢 WebSocket работает! Соединение активно.";
+        status.textContent =
+            "🟢 WebSocket работает! Соединение активно.";
     } else if (socket.readyState === WebSocket.CONNECTING) {
-        status.textContent = "🟡 WebSocket подключается...";
+        status.textContent =
+            "🟡 WebSocket подключается...";
     } else {
-        status.textContent = "🔴 WebSocket не подключён.";
+        status.textContent =
+            "🔴 WebSocket не подключён.";
     }
 };
 

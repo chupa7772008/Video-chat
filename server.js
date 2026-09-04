@@ -1,4 +1,3 @@
-
 const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
@@ -26,34 +25,69 @@ function removeWaiting(ws) {
     }
 }
 
+function matches(user, partner) {
+    const countryMatch =
+        user.searchCountry === "any" ||
+        user.searchCountry === partner.country;
+
+    const genderMatch =
+        user.searchGender === "any" ||
+        user.searchGender === partner.gender;
+
+    return countryMatch && genderMatch;
+}
+
 function findPartner(ws) {
     removeWaiting(ws);
 
-    if (waiting.length === 0) {
-        waiting.push(ws);
-        send(ws, {
-            type: "waiting"
-        });
-        return;
+    for (let i = 0; i < waiting.length; i++) {
+        const partner = waiting[i];
+
+        if (
+            matches(ws, partner) &&
+            matches(partner, ws)
+        ) {
+            waiting.splice(i, 1);
+
+            send(ws, {
+                type: "matched",
+                initiator: true,
+                partner: {
+                    country: partner.country,
+                    gender: partner.gender
+                }
+            });
+
+            send(partner, {
+                type: "matched",
+                initiator: false,
+                partner: {
+                    country: ws.country,
+                    gender: ws.gender
+                }
+            });
+
+            ws.partner = partner;
+            partner.partner = ws;
+
+            return;
+        }
     }
 
-    const partner = waiting.shift();
+    waiting.push(ws);
 
     send(ws, {
-        type: "matched",
-        initiator: true
+        type: "waiting"
     });
-
-    send(partner, {
-        type: "matched",
-        initiator: false
-    });
-
-    ws.partner = partner;
-    partner.partner = ws;
 }
 
 wss.on("connection", (ws) => {
+    ws.country = "unknown";
+    ws.gender = "none";
+    ws.searchCountry = "any";
+    ws.searchGender = "any";
+    ws.partner = null;
+
     send(ws, {
         type: "connected"
     });
@@ -63,6 +97,15 @@ wss.on("connection", (ws) => {
             const data = JSON.parse(message);
 
             if (data.type === "find") {
+                ws.country = data.country || "unknown";
+                ws.gender = data.gender || "none";
+
+                ws.searchCountry =
+                    data.searchCountry || "any";
+
+                ws.searchGender =
+                    data.searchGender || "any";
+
                 findPartner(ws);
             }
 
@@ -92,7 +135,10 @@ wss.on("connection", (ws) => {
                 }
             }
         } catch (error) {
-            console.error("Ошибка сообщения:", error);
+            console.error(
+                "Ошибка сообщения:",
+                error
+            );
         }
     });
 
