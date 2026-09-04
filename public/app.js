@@ -30,14 +30,11 @@ async function startCamera() {
 }
 
 function connectSocket() {
-    socket = new WebSocket(
-        "ws://" + window.location.host
-    );
+   
 
     socket.onopen = () => {
         status.textContent = "Соединение с сервером установлено ✅";
-    };
-
+    }
  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
 
 socket = new WebSocket(
@@ -50,8 +47,8 @@ socket = new WebSocket(
         }
 
         if (data.type === "waiting") {
-            status.textContent = "Ищем собеседника... 🔎";
-        }
+            status.textContent = "Ищем собеседника... 🔎"
+;        }
 
         if (data.type === "matched") {
             status.textContent = "Собеседник найден! 🎉";
