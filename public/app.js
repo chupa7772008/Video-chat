@@ -75,6 +75,15 @@ function updateControls() {
 }
 
 async function startCamera() {
+    if (!navigator.mediaDevices) {
+        status.textContent = "ОШИБКА: mediaDevices НЕДОСТУПЕН ❌";
+        return;
+    }
+    if (!navigator.mediaDevices.getUserMedia) {
+        status.textContent = "ОШИБКА: getUserMedia НЕДОСТУПЕН ❌";
+        return;
+    }
+    status.textContent = "WebView: getUserMedia ЕСТЬ ✅";
     status.textContent = "ЗАПУСК КАМЕРЫ...";
     try {
         localStream =
@@ -598,4 +607,4 @@ if (flipBtn) {
 updateControls();
 
 startCamera();
-connectSocket();
+// connectSocket();
