@@ -75,6 +75,7 @@ function updateControls() {
 }
 
 async function startCamera() {
+    status.textContent = "ЗАПУСК КАМЕРЫ...";
     try {
         localStream =
             await navigator.mediaDevices.getUserMedia({
