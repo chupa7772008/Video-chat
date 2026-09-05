@@ -690,4 +690,4 @@ if (flipBtn) {
 updateControls();
 
 startCamera();
-// connectSocket();
+connectSocket();
