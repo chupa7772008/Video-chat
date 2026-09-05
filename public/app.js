@@ -292,6 +292,36 @@ function connectSocket() {
     };
 }
 
+async function renegotiate() {
+    if (!peerConnection) {
+        return;
+    }
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+        return;
+    }
+
+    try {
+        const offer = await peerConnection.createOffer();
+
+        await peerConnection.setLocalDescription(
+            offer
+        );
+
+        socket.send(
+            JSON.stringify({
+                type: "offer",
+                offer: offer
+            })
+        );
+    } catch (error) {
+        console.error(
+            "Ошибка renegotiation:",
+            error
+        );
+    }
+}
+
 async function createPeerConnection() {
     if (peerConnection) {
         return;
@@ -506,6 +536,8 @@ if (micBtn) {
                         audioTrack,
                         localStream
                     );
+
+                    await renegotiate();
                 }
 
                 micEnabled = true;
