@@ -472,8 +472,11 @@ if (cameraBtn) {
 if (micBtn) {
     micBtn.onclick = async () => {
         if (!localStream) {
+            status.textContent = "МИКРОФОН: localStream НЕ НАЙДЕН ❌";
             return;
         }
+
+        status.textContent = "МИКРОФОН: localStream найден ✅";
 
         let audioTrack =
             localStream.getAudioTracks()[0];
