@@ -113,8 +113,7 @@ async function startCamera() {
             error
         );
 
-        status.textContent =
-            "Не удалось получить доступ к камере/микрофону ❌";
+        status.textContent = "Ошибка камеры: " + (error.name || "UNKNOWN") + " — " + (error.message || "нет описания") + " ❌";
     }
 }
 
