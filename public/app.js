@@ -353,6 +353,13 @@ async function createPeerConnection() {
         remoteVideo.muted =
             !soundEnabled;
 
+        remoteVideo.play().catch((error) => {
+            console.error(
+                "Ошибка воспроизведения звука:",
+                error
+            );
+        });
+
         status.textContent =
             "🎉 Вы подключены к собеседнику!";
     };
