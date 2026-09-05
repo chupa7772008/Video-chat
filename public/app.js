@@ -91,7 +91,7 @@ async function startCamera() {
                 video: {
                     facingMode: currentFacingMode
                 },
-                audio: true
+                audio: false
             });
 
         localVideo.srcObject = localStream;
