@@ -3,6 +3,7 @@ const remoteVideo = document.getElementById("remoteVideo");
 const status = document.getElementById("status");
 const findBtn = document.getElementById("findBtn");
 const nextBtn = document.getElementById("nextBtn");
+const stopBtn = document.getElementById("stopBtn");
 
 const countrySelect = document.getElementById("countrySelect");
 const genderSelect = document.getElementById("genderSelect");
@@ -302,11 +303,28 @@ async function renegotiate() {
     }
 
     try {
+        console.log(
+            "RENEGOTIATE: signalingState =",
+            peerConnection.signalingState,
+            "connectionState =",
+            peerConnection.connectionState,
+            "iceConnectionState =",
+            peerConnection.iceConnectionState
+        );
+
         const offer = await peerConnection.createOffer();
 
         await peerConnection.setLocalDescription(
             offer
         );
+
+        status.textContent =
+            "RENEGOTIATE: " +
+            peerConnection.signalingState +
+            " / " +
+            peerConnection.connectionState +
+            " / " +
+            peerConnection.iceConnectionState;
 
         socket.send(
             JSON.stringify({
@@ -447,6 +465,32 @@ findBtn.onclick = () => {
 
     status.textContent =
         "Ищем подходящего собеседника... 🔎";
+};
+
+stopBtn.onclick = () => {
+    if (
+        socket &&
+        socket.readyState === WebSocket.OPEN
+    ) {
+        socket.send(
+            JSON.stringify({
+                type: "stop"
+            })
+        );
+    }
+
+    if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+    }
+
+    remoteVideo.srcObject = null;
+
+    partnerInfo.textContent =
+        "Собеседник ещё не найден";
+
+    status.textContent =
+        "Соединение остановлено ⏹️";
 };
 
 nextBtn.onclick = () => {

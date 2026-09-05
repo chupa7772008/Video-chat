@@ -109,6 +109,21 @@ wss.on("connection", (ws) => {
                 findPartner(ws);
             }
 
+            if (data.type === "stop") {
+                const partner = ws.partner;
+
+                if (partner) {
+                    partner.partner = null;
+
+                    send(partner, {
+                        type: "partner_left"
+                    });
+                }
+
+                ws.partner = null;
+                removeWaiting(ws);
+            }
+
             if (data.type === "next") {
                 const partner = ws.partner;
 
