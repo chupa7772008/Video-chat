@@ -470,15 +470,63 @@ if (cameraBtn) {
 }
 
 if (micBtn) {
-    micBtn.onclick = () => {
+    micBtn.onclick = async () => {
         if (!localStream) {
             return;
         }
 
-        const audioTrack =
+        let audioTrack =
             localStream.getAudioTracks()[0];
 
         if (!audioTrack) {
+            try {
+                status.textContent = "ЗАПУСК МИКРОФОНА...";
+
+                const audioStream =
+                    await navigator.mediaDevices.getUserMedia({
+                        video: false,
+                        audio: true
+                    });
+
+                audioTrack =
+                    audioStream.getAudioTracks()[0];
+
+                if (!audioTrack) {
+                    status.textContent = "Микрофон не найден ❌";
+                    return;
+                }
+
+                localStream.addTrack(audioTrack);
+
+                if (peerConnection) {
+                    peerConnection.addTrack(
+                        audioTrack,
+                        localStream
+                    );
+                }
+
+                micEnabled = true;
+                audioTrack.enabled = true;
+
+                status.textContent =
+                    "Микрофон включен ✅";
+
+                updateControls();
+
+            } catch (error) {
+                console.error(
+                    "Ошибка микрофона:",
+                    error
+                );
+
+                status.textContent =
+                    "Ошибка микрофона: " +
+                    (error.name || "UNKNOWN") +
+                    " — " +
+                    (error.message || "нет описания") +
+                    " ❌";
+            }
+
             return;
         }
 
