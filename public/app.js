@@ -302,6 +302,14 @@ async function renegotiate() {
         return;
     }
 
+    if (peerConnection.signalingState !== "stable") {
+        console.log(
+            "RENEGOTIATE: пропуск, signalingState =",
+            peerConnection.signalingState
+        );
+        return;
+    }
+
     try {
         console.log(
             "RENEGOTIATE: signalingState =",
@@ -312,7 +320,8 @@ async function renegotiate() {
             peerConnection.iceConnectionState
         );
 
-        const offer = await peerConnection.createOffer();
+        const offer =
+            await peerConnection.createOffer();
 
         await peerConnection.setLocalDescription(
             offer
@@ -329,9 +338,10 @@ async function renegotiate() {
         socket.send(
             JSON.stringify({
                 type: "offer",
-                offer: offer
+                offer: peerConnection.localDescription
             })
         );
+
     } catch (error) {
         console.error(
             "Ошибка renegotiation:",
