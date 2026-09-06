@@ -2,7 +2,6 @@ const localVideo = document.getElementById("localVideo");
 const remoteVideo = document.getElementById("remoteVideo");
 const status = document.getElementById("status");
 const findBtn = document.getElementById("findBtn");
-const nextBtn = document.getElementById("nextBtn");
 const stopBtn = document.getElementById("stopBtn");
 
 const countrySelect = document.getElementById("countrySelect");
@@ -166,6 +165,7 @@ function connectSocket() {
             if (data.type === "matched") {
                 status.textContent =
                     "Собеседник найден! 🎉";
+                findBtn.textContent = "⏭️ Следующий";
 
                 if (data.partner) {
                     const country =
@@ -445,6 +445,32 @@ findBtn.onclick = () => {
         return;
     }
 
+    if (findBtn.textContent.includes("Следующий")) {
+        if (peerConnection) {
+            peerConnection.close();
+            peerConnection = null;
+        }
+
+        remoteVideo.srcObject = null;
+
+        partnerInfo.textContent =
+            "Ищем нового собеседника... 🔎";
+
+        socket.send(
+            JSON.stringify({
+                type: "next"
+            })
+        );
+
+        findBtn.textContent =
+            "🔎 Найти собеседника";
+
+        status.textContent =
+            "Ищем нового собеседника... 🔎";
+
+        return;
+    }
+
     partnerInfo.textContent =
         "Ищем собеседника... 🔎";
 
@@ -503,31 +529,6 @@ stopBtn.onclick = () => {
         "Соединение остановлено ⏹️";
 };
 
-nextBtn.onclick = () => {
-    if (peerConnection) {
-        peerConnection.close();
-        peerConnection = null;
-    }
-
-    remoteVideo.srcObject = null;
-
-    partnerInfo.textContent =
-        "Ищем нового собеседника... 🔎";
-
-    if (
-        socket &&
-        socket.readyState === WebSocket.OPEN
-    ) {
-        socket.send(
-            JSON.stringify({
-                type: "next"
-            })
-        );
-    }
-
-    status.textContent =
-        "Ищем нового собеседника... 🔎";
-};
 
 if (privateBtn) {
     privateBtn.onclick = () => {
