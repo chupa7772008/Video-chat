@@ -60,7 +60,6 @@
     transform: scale(0.92);
 }
 
-    <style>
         * {
             box-sizing: border-box;
         }
@@ -172,12 +171,139 @@
                 font-size: 26px;
             }
         }
+
+        .auth-bar {
+            width: 95%;
+            max-width: 700px;
+            margin: 15px auto;
+            padding: 12px;
+            background: #1d1d1d;
+            border-radius: 15px;
+        }
+
+        .auth-bar button {
+            background: #333;
+            color: white;
+            margin: 5px;
+        }
+
+        .auth-user {
+            color: #20c55a;
+            font-weight: bold;
+        }
+
+        .auth-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-modal.active {
+            display: flex;
+        }
+
+        .auth-box {
+            width: 100%;
+            max-width: 400px;
+            background: #1d1d1d;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,.5);
+        }
+
+        .auth-box h2 {
+            margin-top: 0;
+        }
+
+        .auth-box input {
+            width: 100%;
+            padding: 13px;
+            margin: 7px 0;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background: #2b2b2b;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .auth-box .auth-submit {
+            width: 100%;
+            background: #20c55a;
+            color: white;
+            margin-top: 12px;
+        }
+
+        .auth-box .auth-close {
+            width: 100%;
+            background: #444;
+            color: white;
+        }
+
+        #authMessage {
+            min-height: 22px;
+            margin: 10px 0;
+            color: #ffcc00;
+        }
+
     </style>
 </head>
 
 <body>
 
     <h1>Видеочат Чупа</h1>
+
+
+    <div class="auth-bar">
+        <span id="authGuest">Вы не авторизованы</span>
+
+        <span id="authUser" class="auth-user" style="display:none;"></span>
+
+        <button id="loginBtn">🔐 Войти</button>
+        <button id="registerBtn">📝 Регистрация</button>
+        <button id="logoutBtn" style="display:none;">🚪 Выйти</button>
+    </div>
+
+    <div id="authModal" class="auth-modal">
+        <div class="auth-box">
+
+            <h2 id="authTitle">Войти</h2>
+
+            <input
+                id="authUsername"
+                type="text"
+                placeholder="Логин"
+                minlength="3"
+                maxlength="32"
+                autocomplete="username"
+            >
+
+            <input
+                id="authPassword"
+                type="password"
+                placeholder="Пароль"
+                minlength="6"
+                autocomplete="current-password"
+            >
+
+            <div id="authMessage"></div>
+
+            <button id="authSubmit" class="auth-submit">
+                Войти
+            </button>
+
+            <button id="authClose" class="auth-close">
+                Закрыть
+            </button>
+
+        </div>
+    </div>
+
 
     <div class="subtitle">
         Онлайн-видеочат с людьми со всего мира
@@ -394,6 +520,158 @@
         </div>
 
     </div>
+
+
+<script>
+(function () {
+
+    const modal = document.getElementById("authModal");
+    const title = document.getElementById("authTitle");
+    const username = document.getElementById("authUsername");
+    const password = document.getElementById("authPassword");
+    const message = document.getElementById("authMessage");
+    const submit = document.getElementById("authSubmit");
+
+    const loginBtn = document.getElementById("loginBtn");
+    const registerBtn = document.getElementById("registerBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const authGuest = document.getElementById("authGuest");
+    const authUser = document.getElementById("authUser");
+
+    let mode = "login";
+
+    function openAuth(newMode) {
+        mode = newMode;
+
+        title.textContent =
+            mode === "login" ? "Войти" : "Регистрация";
+
+        submit.textContent =
+            mode === "login"
+                ? "Войти"
+                : "Зарегистрироваться";
+
+        username.value = "";
+        password.value = "";
+        message.textContent = "";
+
+        modal.classList.add("active");
+        username.focus();
+    }
+
+    function closeAuth() {
+        modal.classList.remove("active");
+    }
+
+    function updateAuthUI() {
+
+        const user = localStorage.getItem("videoChatUser");
+
+        if (user) {
+            authGuest.style.display = "none";
+            loginBtn.style.display = "none";
+            registerBtn.style.display = "none";
+
+            authUser.style.display = "inline";
+            logoutBtn.style.display = "inline";
+
+            authUser.textContent = "👤 " + user;
+        } else {
+            authGuest.style.display = "inline";
+            loginBtn.style.display = "inline";
+            registerBtn.style.display = "inline";
+
+            authUser.style.display = "none";
+            logoutBtn.style.display = "none";
+        }
+    }
+
+    loginBtn.addEventListener("click", function () {
+        openAuth("login");
+    });
+
+    registerBtn.addEventListener("click", function () {
+        openAuth("register");
+    });
+
+    document.getElementById("authClose")
+        .addEventListener("click", closeAuth);
+
+    logoutBtn.addEventListener("click", function () {
+        localStorage.removeItem("videoChatUser");
+        updateAuthUI();
+    });
+
+    submit.addEventListener("click", async function () {
+
+        const name = username.value.trim();
+        const pass = password.value;
+
+        if (!name || !pass) {
+            message.textContent = "Введите логин и пароль";
+            return;
+        }
+
+        submit.disabled = true;
+        message.textContent = "Подождите...";
+
+        try {
+
+            const endpoint =
+                mode === "login"
+                    ? "/api/login"
+                    : "/api/register";
+
+            const response = await fetch(endpoint, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    username: name,
+                    password: pass,
+                    country: "unknown",
+                    gender: "none"
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(
+                    data.error || "Ошибка сервера"
+                );
+            }
+
+            localStorage.setItem(
+                "videoChatUser",
+                data.user.username
+            );
+
+            message.textContent =
+                mode === "login"
+                    ? "Вход выполнен!"
+                    : "Регистрация выполнена!";
+
+            updateAuthUI();
+
+            setTimeout(closeAuth, 700);
+
+        } catch (error) {
+
+            message.textContent = error.message;
+
+        } finally {
+
+            submit.disabled = false;
+        }
+    });
+
+    updateAuthUI();
+
+})();
+</script>
 
     <script src="app.js"></script>
 
