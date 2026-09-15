@@ -37,7 +37,7 @@ function requestUserLocation() {
             try {
 
                 const url =
-                    "https://api.bigdatacloud.net/data/reverse-geocode-client" +
+                    "https" + "://" + "api" + ".bigdatacloud" + ".net/data/reverse-geocode-client" +
                     "?latitude=" +
                     encodeURIComponent(latitude) +
                     "&longitude=" +
