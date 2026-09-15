@@ -338,7 +338,7 @@
             Ваша страна
         </label>
 
-        <select id="countrySelect">
+        <select id="countrySelect" disabled>
             <option value="RU">🇷🇺 Россия</option>
             <option value="UA">🇺🇦 Украина</option>
             <option value="NL">🇳🇱 Нидерланды</option>
@@ -540,12 +540,17 @@
     const authUser = document.getElementById("authUser");
 
     let mode = "login";
+    let currentUser = null;
+
 
     function openAuth(newMode) {
+
         mode = newMode;
 
         title.textContent =
-            mode === "login" ? "Войти" : "Регистрация";
+            mode === "login"
+                ? "Войти"
+                : "Регистрация";
 
         submit.textContent =
             mode === "login"
@@ -557,18 +562,20 @@
         message.textContent = "";
 
         modal.classList.add("active");
+
         username.focus();
     }
+
 
     function closeAuth() {
         modal.classList.remove("active");
     }
 
+
     function updateAuthUI() {
 
-        const user = localStorage.getItem("videoChatUser");
+        if (currentUser) {
 
-        if (user) {
             authGuest.style.display = "none";
             loginBtn.style.display = "none";
             registerBtn.style.display = "none";
@@ -576,8 +583,11 @@
             authUser.style.display = "inline";
             logoutBtn.style.display = "inline";
 
-            authUser.textContent = "👤 " + user;
+            authUser.textContent =
+                "👤 " + currentUser.username;
+
         } else {
+
             authGuest.style.display = "inline";
             loginBtn.style.display = "inline";
             registerBtn.style.display = "inline";
@@ -587,88 +597,236 @@
         }
     }
 
-    loginBtn.addEventListener("click", function () {
-        openAuth("login");
-    });
 
-    registerBtn.addEventListener("click", function () {
-        openAuth("register");
-    });
-
-    document.getElementById("authClose")
-        .addEventListener("click", closeAuth);
-
-    logoutBtn.addEventListener("click", function () {
-        localStorage.removeItem("videoChatUser");
-        updateAuthUI();
-    });
-
-    submit.addEventListener("click", async function () {
-
-        const name = username.value.trim();
-        const pass = password.value;
-
-        if (!name || !pass) {
-            message.textContent = "Введите логин и пароль";
-            return;
-        }
-
-        submit.disabled = true;
-        message.textContent = "Подождите...";
+    async function checkSession() {
 
         try {
 
-            const endpoint =
-                mode === "login"
-                    ? "/api/login"
-                    : "/api/register";
-
-            const response = await fetch(endpoint, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    username: name,
-                    password: pass,
-                    country: "unknown",
-                    gender: "none"
-                })
-            });
+            const response = await fetch(
+                "/api/me",
+                {
+                    method: "GET",
+                    credentials: "same-origin"
+                }
+            );
 
             const data = await response.json();
 
-            if (!response.ok || !data.success) {
-                throw new Error(
-                    data.error || "Ошибка сервера"
-                );
+            if (
+                response.ok &&
+                data.authenticated &&
+                data.user
+            ) {
+                currentUser = data.user;
+
+                requestUserLocation();
+
+                if (countrySelect && currentUser.country) {
+                    countrySelect.value = currentUser.country;
+                }
+
+                if (genderSelect && currentUser.gender) {
+                    genderSelect.value = currentUser.gender;
+                }
+
+            } else {
+                currentUser = null;
             }
-
-            localStorage.setItem(
-                "videoChatUser",
-                data.user.username
-            );
-
-            message.textContent =
-                mode === "login"
-                    ? "Вход выполнен!"
-                    : "Регистрация выполнена!";
-
-            updateAuthUI();
-
-            setTimeout(closeAuth, 700);
 
         } catch (error) {
 
-            message.textContent = error.message;
+            console.error(
+                "Ошибка проверки авторизации:",
+                error
+            );
 
-        } finally {
-
-            submit.disabled = false;
+            currentUser = null;
         }
-    });
+
+        updateAuthUI();
+    }
+
+
+    loginBtn.addEventListener(
+        "click",
+        function () {
+            openAuth("login");
+        }
+    );
+
+
+    registerBtn.addEventListener(
+        "click",
+        function () {
+            openAuth("register");
+        }
+    );
+
+
+    document
+        .getElementById("authClose")
+        .addEventListener(
+            "click",
+            closeAuth
+        );
+
+
+    logoutBtn.addEventListener(
+        "click",
+        async function () {
+
+            logoutBtn.disabled = true;
+
+            try {
+
+                const response = await fetch(
+                    "/api/logout",
+                    {
+                        method: "POST",
+                        credentials: "same-origin"
+                    }
+                );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(
+                        data.error ||
+                        "Ошибка выхода"
+                    );
+                }
+
+                currentUser = null;
+
+                updateAuthUI();
+
+            } catch (error) {
+
+                console.error(
+                    "Ошибка выхода:",
+                    error
+                );
+
+                alert(
+                    error.message ||
+                    "Не удалось выйти"
+                );
+
+            } finally {
+
+                logoutBtn.disabled = false;
+            }
+        }
+    );
+
+
+    submit.addEventListener(
+        "click",
+        async function () {
+
+            const name =
+                username.value.trim();
+
+            const pass =
+                password.value;
+
+            if (!name || !pass) {
+
+                message.textContent =
+                    "Введите логин и пароль";
+
+                return;
+            }
+
+            submit.disabled = true;
+
+            message.textContent =
+                "Подождите...";
+
+            try {
+
+                const endpoint =
+                    mode === "login"
+                        ? "/api/login"
+                        : "/api/register";
+
+                const response =
+                    await fetch(
+                        endpoint,
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            credentials:
+                                "same-origin",
+
+                            body: JSON.stringify({
+                                username: name,
+                                password: pass,
+                                country:
+                                    document.getElementById(
+                                        "countrySelect"
+                                    )?.value ||
+                                    "unknown",
+                                gender:
+                                    document.getElementById(
+                                        "genderSelect"
+                                    )?.value ||
+                                    "none"
+                            })
+                        }
+                    );
+
+                const data =
+                    await response.json();
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+                    throw new Error(
+                        data.error ||
+                        "Ошибка сервера"
+                    );
+                }
+
+                currentUser =
+                    data.user;
+
+                message.textContent =
+                    mode === "login"
+                        ? "Вход выполнен!"
+                        : "Регистрация выполнена!";
+
+                updateAuthUI();
+
+                setTimeout(
+                    closeAuth,
+                    700
+                );
+
+            } catch (error) {
+
+                message.textContent =
+                    error.message ||
+                    "Ошибка сервера";
+
+            } finally {
+
+                submit.disabled = false;
+            }
+        }
+    );
+
 
     updateAuthUI();
+
+    checkSession();
 
 })();
 </script>

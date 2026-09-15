@@ -4,6 +4,7 @@ const WebSocket = require("ws");
 const path = require("path");
 const db = require("./db");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 const app = express();
 const server = http.createServer(app);
@@ -11,6 +12,127 @@ const wss = new WebSocket.Server({ server });
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+
+// ======================================================
+// СЕРВЕРНЫЕ СЕССИИ
+// ======================================================
+
+const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 30;
+
+function getClientIp(req) {
+
+    const forwardedFor =
+        req.headers["x-forwarded-for"];
+
+    if (forwardedFor) {
+        return forwardedFor
+            .split(",")[0]
+            .trim();
+    }
+
+    return (
+        req.headers["cf-connecting-ip"] ||
+        req.socket.remoteAddress ||
+        "unknown"
+    );
+}
+
+
+function createSessionToken() {
+    return crypto.randomBytes(32).toString("hex");
+}
+
+function setSessionCookie(res, token, req) {
+    const forwardedProto = req.headers["x-forwarded-proto"];
+    const isHttps =
+        forwardedProto === "https" ||
+        req.protocol === "https";
+
+    const secure = isHttps ? "; Secure" : "";
+
+    res.setHeader(
+        "Set-Cookie",
+        `session=${token}; HttpOnly; Path=/; Max-Age=${Math.floor(
+            SESSION_DURATION_MS / 1000
+        )}; SameSite=Lax${secure}`
+    );
+}
+
+function clearSessionCookie(res, req) {
+    const forwardedProto = req.headers["x-forwarded-proto"];
+    const isHttps =
+        forwardedProto === "https" ||
+        req.protocol === "https";
+
+    const secure = isHttps ? "; Secure" : "";
+
+    res.setHeader(
+        "Set-Cookie",
+        `session=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax${secure}`
+    );
+}
+
+function getSessionToken(req) {
+    const cookieHeader = req.headers.cookie;
+
+    if (!cookieHeader) {
+        return null;
+    }
+
+    const cookies = cookieHeader.split(";");
+
+    for (const cookie of cookies) {
+        const parts = cookie.trim().split("=");
+
+        if (parts[0] === "session") {
+            return parts.slice(1).join("=") || null;
+        }
+    }
+
+    return null;
+}
+
+async function getAuthenticatedUser(req) {
+
+    const token = getSessionToken(req);
+
+    if (!token) {
+        return null;
+    }
+
+    const result = await db.query(
+        `SELECT
+            u.id,
+            u.username,
+            u.country,
+            u.gender,
+            u.role,
+            u.is_banned
+         FROM sessions s
+         JOIN users u ON u.id = s.user_id
+         WHERE s.token = $1
+           AND s.expires_at > NOW()`,
+        [token]
+    );
+
+    if (result.rows.length === 0) {
+        return null;
+    }
+
+    const user = result.rows[0];
+
+    if (user.is_banned) {
+        await db.query(
+            "DELETE FROM sessions WHERE token = $1",
+            [token]
+        );
+
+        return null;
+    }
+
+    return user;
+}
+
 
 
 // ======================================================
@@ -70,9 +192,35 @@ app.post("/api/register", async (req, res) => {
             ]
         );
 
+        const newUser = result.rows[0];
+
+        const sessionToken = createSessionToken();
+
+        const expiresAt = new Date(
+            Date.now() + SESSION_DURATION_MS
+        );
+
+        await db.query(
+            `INSERT INTO sessions
+                (token, user_id, expires_at)
+             VALUES
+                ($1, $2, $3)`,
+            [
+                sessionToken,
+                newUser.id,
+                expiresAt
+            ]
+        );
+
+        setSessionCookie(
+            res,
+            sessionToken,
+            req
+        );
+
         res.status(201).json({
             success: true,
-            user: result.rows[0]
+            user: newUser
         });
 
     } catch (error) {
@@ -141,6 +289,30 @@ app.post("/api/login", async (req, res) => {
             });
         }
 
+        const sessionToken = createSessionToken();
+
+        const expiresAt = new Date(
+            Date.now() + SESSION_DURATION_MS
+        );
+
+        await db.query(
+            `INSERT INTO sessions
+                (token, user_id, expires_at)
+             VALUES
+                ($1, $2, $3)`,
+            [
+                sessionToken,
+                user.id,
+                expiresAt
+            ]
+        );
+
+        setSessionCookie(
+            res,
+            sessionToken,
+            req
+        );
+
         res.json({
             success: true,
             user: {
@@ -154,6 +326,155 @@ app.post("/api/login", async (req, res) => {
 
     } catch (error) {
         console.error("Ошибка входа:", error);
+
+        res.status(500).json({
+            error: "Ошибка сервера"
+        });
+    }
+});
+
+
+// ======================================================
+// ТЕКУЩИЙ ПОЛЬЗОВАТЕЛЬ
+// ======================================================
+
+app.get("/api/me", async (req, res) => {
+
+    try {
+
+        const user = await getAuthenticatedUser(req);
+
+        if (!user) {
+            return res.status(401).json({
+                authenticated: false
+            });
+        }
+
+        res.json({
+            authenticated: true,
+            user: {
+                id: user.id,
+                username: user.username,
+                country: user.country,
+                gender: user.gender,
+                role: user.role
+            }
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Ошибка проверки сессии:",
+            error
+        );
+
+        res.status(500).json({
+            error: "Ошибка сервера"
+        });
+    }
+});
+
+
+// ======================================================
+// ВЫХОД
+// ======================================================
+
+app.post("/api/logout", async (req, res) => {
+
+    try {
+
+        const token = getSessionToken(req);
+
+        if (token) {
+            await db.query(
+                "DELETE FROM sessions WHERE token = $1",
+                [token]
+            );
+        }
+
+        clearSessionCookie(res, req);
+
+        res.json({
+            success: true
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Ошибка выхода:",
+            error
+        );
+
+        res.status(500).json({
+            error: "Ошибка сервера"
+        });
+    }
+});
+
+
+// ======================================================
+// ПРОВЕРКА БАЗЫ
+
+
+// ======================================================
+
+// ======================================================
+// ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ
+// ======================================================
+
+app.put("/api/profile", async (req, res) => {
+
+    try {
+
+        const user = await getAuthenticatedUser(req);
+
+        if (!user) {
+            return res.status(401).json({
+                error: "Необходима авторизация"
+            });
+        }
+
+        const country =
+            req.body.country || "unknown";
+
+        const gender =
+            req.body.gender || "none";
+
+        const result = await db.query(
+            `UPDATE users
+             SET country = $1,
+                 gender = $2
+             WHERE id = $3
+             RETURNING
+                 id,
+                 username,
+                 country,
+                 gender,
+                 role`,
+            [
+                country,
+                gender,
+                user.id
+            ]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                error: "Пользователь не найден"
+            });
+        }
+
+        res.json({
+            success: true,
+            user: result.rows[0]
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Ошибка обновления профиля:",
+            error
+        );
 
         res.status(500).json({
             error: "Ошибка сервера"
@@ -297,10 +618,26 @@ function findPartner(ws) {
 // WEBSOCKET
 // ======================================================
 
-wss.on("connection", (ws) => {
+wss.on("connection", async (ws, request) => {
 
-    ws.country = "unknown";
-    ws.gender = "none";
+    try {
+        ws.user = await getAuthenticatedUser(request);
+    } catch (error) {
+        console.error(
+            "Ошибка проверки WebSocket-сессии:",
+            error
+        );
+
+        ws.user = null;
+    }
+
+    if (ws.user) {
+        ws.country = ws.user.country || "unknown";
+        ws.gender = ws.user.gender || "none";
+    } else {
+        ws.country = "unknown";
+        ws.gender = "none";
+    }
 
     ws.searchCountry = "any";
     ws.searchGender = "any";
@@ -324,12 +661,6 @@ wss.on("connection", (ws) => {
             // ==========================================
 
             if (data.type === "find") {
-
-                ws.country =
-                    data.country || "unknown";
-
-                ws.gender =
-                    data.gender || "none";
 
                 ws.searchCountry =
                     data.searchCountry || "any";

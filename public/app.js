@@ -8,6 +8,217 @@ const countrySelect = document.getElementById("countrySelect");
 const genderSelect = document.getElementById("genderSelect");
 const searchCountrySelect = document.getElementById("searchCountrySelect");
 const searchGenderSelect = document.getElementById("searchGenderSelect");
+
+function requestUserLocation() {
+
+    if (!navigator.geolocation) {
+
+        console.error(
+            "Геолокация не поддерживается браузером"
+        );
+
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        async (position) => {
+
+            const latitude =
+                position.coords.latitude;
+
+            const longitude =
+                position.coords.longitude;
+
+            console.log(
+                "Геопозиция получена:",
+                latitude,
+                longitude
+            );
+
+            try {
+
+                const url =
+                    "https://api.bigdatacloud.net/data/reverse-geocode-client" +
+                    "?latitude=" +
+                    encodeURIComponent(latitude) +
+                    "&longitude=" +
+                    encodeURIComponent(longitude) +
+                    "&localityLanguage=ru";
+
+                const response =
+                    await fetch(url);
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "HTTP " + response.status
+                    );
+                }
+
+                const data =
+                    await response.json();
+
+                const countryCode =
+                    data.countryCode;
+
+                const countryName =
+                    data.countryName;
+
+                console.log(
+                    "Страна по геопозиции:",
+                    countryName,
+                    countryCode
+                );
+
+                if (!countryCode) {
+
+                    throw new Error(
+                        "Код страны не получен"
+                    );
+                }
+
+                if (countrySelect) {
+
+                    countrySelect.value =
+                        countryCode;
+                }
+
+                if (currentUser) {
+
+                    const profileResponse =
+                        await fetch(
+                            "/api/profile",
+                            {
+                                method: "PUT",
+                                credentials: "same-origin",
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+                                body: JSON.stringify({
+                                    country:
+                                        countryCode,
+                                    gender:
+                                        genderSelect?.value ||
+                                        currentUser.gender ||
+                                        "none"
+                                })
+                            }
+                        );
+
+                    const profileData =
+                        await profileResponse.json();
+
+                    if (!profileResponse.ok) {
+
+                        throw new Error(
+                            profileData.error ||
+                            "Ошибка сохранения профиля"
+                        );
+                    }
+
+                    if (profileData.user) {
+
+                        currentUser =
+                            profileData.user;
+                    }
+
+                    console.log(
+                        "Страна сохранена в PostgreSQL:",
+                        countryCode
+                    );
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Ошибка определения страны:",
+                    error
+                );
+            }
+        },
+
+        (error) => {
+
+            console.error(
+                "Ошибка геолокации:",
+                error
+            );
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000
+        }
+    );
+}
+
+
+
+
+
+
+async function saveProfile() {
+
+    if (!currentUser) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch("/api/profile", {
+            method: "PUT",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                country: countrySelect.value,
+                gender: genderSelect.value
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error(
+                "Ошибка сохранения профиля:",
+                data
+            );
+            return;
+        }
+
+        if (data.user) {
+            currentUser = data.user;
+        }
+
+        console.log(
+            "Профиль сохранён:",
+            data.user
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Ошибка сохранения профиля:",
+            error
+        );
+    }
+}
+
+
+countrySelect.addEventListener(
+    "change",
+    saveProfile
+);
+
+genderSelect.addEventListener(
+    "change",
+    saveProfile
+);
+
 const partnerInfo = document.getElementById("partnerInfo");
 
 const privateBtn = document.getElementById("privateBtn");
