@@ -664,6 +664,7 @@ wss.on("connection", async (ws, request) => {
     }
 
     ws.searchCountry = "any";
+    console.log("WS USER:", ws.user ? ws.user.username : "НЕ АВТОРИЗОВАН", "| country:", ws.country, "| gender:", ws.gender);
     ws.searchGender = "any";
 
     ws.partner = null;
