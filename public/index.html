@@ -1065,20 +1065,7 @@
 
 <script src="app.js"></script>
 
-<script>
-setTimeout(function waitForLocation() {
-    if (
-        typeof currentUser !== "undefined" &&
-        currentUser &&
-        typeof requestUserLocation === "function"
-    ) {
-        requestUserLocation();
-        return;
-    }
 
-    setTimeout(waitForLocation, 500);
-}, 500);
-</script>
 
 </body>
 </html>
