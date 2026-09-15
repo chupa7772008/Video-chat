@@ -1,3 +1,4 @@
+window.__APP_JS_STARTED__ = true;
 const localVideo = document.getElementById("localVideo");
 const remoteVideo = document.getElementById("remoteVideo");
 const status = document.getElementById("status");
