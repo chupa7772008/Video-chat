@@ -1110,7 +1110,32 @@
 
     function updateAuthUI() {
 
+        const sidebarUserName =
+            document.getElementById("sidebarUserName");
+
+        const sidebarUserStatus =
+            document.getElementById("sidebarUserStatus");
+
+        const sidebarLogin =
+            document.getElementById("sidebarLogin");
+
+        const sidebarRegister =
+            document.getElementById("sidebarRegister");
+
+        const sidebarLogout =
+            document.getElementById("sidebarLogout");
+
         if (currentUser) {
+
+            sidebarUserName.textContent =
+                "👤 " + currentUser.username;
+
+            sidebarUserStatus.textContent =
+                "Вы вошли в аккаунт";
+
+            sidebarLogin.style.display = "none";
+            sidebarRegister.style.display = "none";
+            sidebarLogout.style.display = "block";
 
             authGuest.style.display = "none";
             loginBtn.style.display = "none";
@@ -1133,6 +1158,16 @@
             }
 
         } else {
+
+            sidebarUserName.textContent =
+                "Гость";
+
+            sidebarUserStatus.textContent =
+                "Войдите в аккаунт";
+
+            sidebarLogin.style.display = "block";
+            sidebarRegister.style.display = "block";
+            sidebarLogout.style.display = "none";
 
             authGuest.style.display = "inline";
             loginBtn.style.display = "inline";
