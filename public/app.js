@@ -12,11 +12,9 @@ const searchGenderSelect = document.getElementById("searchGenderSelect");
 function requestUserLocation() {
 
     if (!navigator.geolocation) {
-
         console.error(
             "Геолокация не поддерживается браузером"
         );
-
         return;
     }
 
@@ -50,7 +48,6 @@ function requestUserLocation() {
                     await fetch(url);
 
                 if (!response.ok) {
-
                     throw new Error(
                         "HTTP " + response.status
                     );
@@ -72,14 +69,12 @@ function requestUserLocation() {
                 );
 
                 if (!countryCode) {
-
                     throw new Error(
                         "Код страны не получен"
                     );
                 }
 
                 if (countrySelect) {
-
                     countrySelect.value =
                         countryCode;
                 }
@@ -98,11 +93,7 @@ function requestUserLocation() {
                                 },
                                 body: JSON.stringify({
                                     country:
-                                        countryCode,
-                                    gender:
-                                        genderSelect?.value ||
-                                        currentUser.gender ||
-                                        "none"
+                                        countryCode
                                 })
                             }
                         );
@@ -111,15 +102,13 @@ function requestUserLocation() {
                         await profileResponse.json();
 
                     if (!profileResponse.ok) {
-
                         throw new Error(
                             profileData.error ||
-                            "Ошибка сохранения профиля"
+                            "Ошибка сохранения страны"
                         );
                     }
 
                     if (profileData.user) {
-
                         currentUser =
                             profileData.user;
                     }
@@ -155,11 +144,6 @@ function requestUserLocation() {
     );
 }
 
-
-
-
-
-
 async function saveProfile() {
 
     if (!currentUser) {
@@ -175,8 +159,7 @@ async function saveProfile() {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                country: countrySelect.value,
-                gender: genderSelect.value
+                country: countrySelect.value
             })
         });
 
@@ -214,10 +197,8 @@ countrySelect.addEventListener(
     saveProfile
 );
 
-genderSelect.addEventListener(
-    "change",
-    saveProfile
-);
+// Пол пользователя задаётся только при регистрации.
+
 
 const partnerInfo = document.getElementById("partnerInfo");
 

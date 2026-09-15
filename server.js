@@ -437,14 +437,10 @@ app.put("/api/profile", async (req, res) => {
         const country =
             req.body.country || "unknown";
 
-        const gender =
-            req.body.gender || "none";
-
         const result = await db.query(
             `UPDATE users
-             SET country = $1,
-                 gender = $2
-             WHERE id = $3
+             SET country = $1
+             WHERE id = $2
              RETURNING
                  id,
                  username,
@@ -453,7 +449,6 @@ app.put("/api/profile", async (req, res) => {
                  role`,
             [
                 country,
-                gender,
                 user.id
             ]
         );

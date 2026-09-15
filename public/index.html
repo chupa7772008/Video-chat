@@ -17,8 +17,11 @@
     >
 
     <meta name="robots" content="index, follow">
-    
-    <meta name="google-site-verification" content="arU5EOgRXb-wgtVlb317WqRLErwjmP5f9KUZx1-ivkQ" />
+
+    <meta
+        name="google-site-verification"
+        content="arU5EOgRXb-wgtVlb317WqRLErwjmP5f9KUZx1-ivkQ"
+    >
 
     <meta property="og:title" content="Видеочат Чупа">
     <meta
@@ -26,46 +29,15 @@
         content="Онлайн-видеочат с людьми со всего мира."
     >
     <meta property="og:type" content="website">
-<style>
-.video-box {
-    position: relative;
-}
 
-.video-controls {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 12px;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    z-index: 10;
-}
-
-.video-controls button {
-    width: 48px;
-    height: 48px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.65);
-    color: white;
-    font-size: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.video-controls button:active {
-    transform: scale(0.92);
-}
-
+    <style>
         * {
             box-sizing: border-box;
         }
 
         body {
             margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
             background: #111;
             color: #fff;
@@ -82,6 +54,102 @@
             margin-bottom: 20px;
         }
 
+        .auth-bar {
+            width: 95%;
+            max-width: 700px;
+            margin: 15px auto;
+            padding: 12px;
+            background: #1d1d1d;
+            border-radius: 15px;
+        }
+
+        .auth-bar button {
+            background: #333;
+            color: #fff;
+            margin: 5px;
+            padding: 10px 15px;
+            border: 0;
+            border-radius: 9px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .auth-user {
+            color: #20c55a;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .auth-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-modal.active {
+            display: flex;
+        }
+
+        .auth-box {
+            width: 100%;
+            max-width: 400px;
+            background: #1d1d1d;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-box h2 {
+            margin-top: 0;
+        }
+
+        .auth-box input,
+        .auth-box select {
+            width: 100%;
+            padding: 13px;
+            margin: 7px 0;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background: #2b2b2b;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .auth-submit {
+            width: 100%;
+            background: #20c55a;
+            color: #fff;
+            margin-top: 12px;
+            padding: 13px;
+            border: 0;
+            border-radius: 9px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .auth-close {
+            width: 100%;
+            background: #444;
+            color: #fff;
+            margin-top: 8px;
+            padding: 13px;
+            border: 0;
+            border-radius: 9px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #authMessage {
+            min-height: 22px;
+            margin: 10px 0;
+            color: #ffcc00;
+        }
+
         .videos {
             display: flex;
             gap: 15px;
@@ -90,13 +158,51 @@
             padding: 10px;
         }
 
-        video {
+        .video-box {
+            position: relative;
             width: 45%;
             max-width: 600px;
             min-width: 300px;
+        }
+
+        video {
+            width: 100%;
+            display: block;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
             background: #000;
             border-radius: 12px;
             border: 2px solid #333;
+        }
+
+        .video-controls {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .video-controls button {
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .video-controls button:active {
+            transform: scale(0.92);
         }
 
         .panel {
@@ -121,38 +227,39 @@
             border-radius: 8px;
             border: 1px solid #555;
             background: #2b2b2b;
-            color: white;
+            color: #fff;
             font-size: 16px;
         }
 
-        button {
+        .main-button {
             margin: 8px 5px;
             padding: 13px 20px;
             border: none;
             border-radius: 9px;
             font-size: 16px;
             cursor: pointer;
+            color: #fff;
         }
 
         #findBtn {
             background: #20c55a;
-            color: white;
         }
 
-        #nextBtn {
-            background: #e09b20;
-            color: white;
+        #stopBtn {
+            background: #d64545;
         }
 
         #status {
             margin: 15px 0;
             font-size: 17px;
+            min-height: 24px;
         }
 
         #partnerInfo {
             margin: 10px 0;
             color: #ddd;
             font-size: 16px;
+            min-height: 24px;
         }
 
         .age-warning {
@@ -162,7 +269,7 @@
         }
 
         @media (max-width: 700px) {
-            video {
+            .video-box {
                 width: 100%;
                 min-width: 0;
             }
@@ -170,87 +277,11 @@
             h1 {
                 font-size: 26px;
             }
-        }
 
-        .auth-bar {
-            width: 95%;
-            max-width: 700px;
-            margin: 15px auto;
-            padding: 12px;
-            background: #1d1d1d;
-            border-radius: 15px;
+            .panel {
+                padding: 15px;
+            }
         }
-
-        .auth-bar button {
-            background: #333;
-            color: white;
-            margin: 5px;
-        }
-
-        .auth-user {
-            color: #20c55a;
-            font-weight: bold;
-        }
-
-        .auth-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .auth-modal.active {
-            display: flex;
-        }
-
-        .auth-box {
-            width: 100%;
-            max-width: 400px;
-            background: #1d1d1d;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 40px rgba(0,0,0,.5);
-        }
-
-        .auth-box h2 {
-            margin-top: 0;
-        }
-
-        .auth-box input {
-            width: 100%;
-            padding: 13px;
-            margin: 7px 0;
-            border-radius: 8px;
-            border: 1px solid #555;
-            background: #2b2b2b;
-            color: white;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-
-        .auth-box .auth-submit {
-            width: 100%;
-            background: #20c55a;
-            color: white;
-            margin-top: 12px;
-        }
-
-        .auth-box .auth-close {
-            width: 100%;
-            background: #444;
-            color: white;
-        }
-
-        #authMessage {
-            min-height: 22px;
-            margin: 10px 0;
-            color: #ffcc00;
-        }
-
     </style>
 </head>
 
@@ -258,21 +289,45 @@
 
     <h1>Видеочат Чупа</h1>
 
-
     <div class="auth-bar">
-        <span id="authGuest">Вы не авторизованы</span>
 
-        <span id="authUser" class="auth-user" style="display:none;"></span>
+        <span id="authGuest">
+            Вы не авторизованы
+        </span>
 
-        <button id="loginBtn">🔐 Войти</button>
-        <button id="registerBtn">📝 Регистрация</button>
-        <button id="logoutBtn" style="display:none;">🚪 Выйти</button>
+        <span
+            id="authUser"
+            class="auth-user"
+            style="display: none;"
+        ></span>
+
+        <button id="loginBtn">
+            🔐 Войти
+        </button>
+
+        <button id="registerBtn">
+            📝 Регистрация
+        </button>
+
+        <button
+            id="logoutBtn"
+            style="display: none;"
+        >
+            🚪 Выйти
+        </button>
+
     </div>
 
-    <div id="authModal" class="auth-modal">
+    <div
+        id="authModal"
+        class="auth-modal"
+    >
+
         <div class="auth-box">
 
-            <h2 id="authTitle">Войти</h2>
+            <h2 id="authTitle">
+                Войти
+            </h2>
 
             <input
                 id="authUsername"
@@ -291,42 +346,91 @@
                 autocomplete="current-password"
             >
 
+            <select
+                id="authGender"
+                style="display: none;"
+            >
+                <option value="">
+                    Выберите пол
+                </option>
+
+                <option value="male">
+                    👨 Мужчина
+                </option>
+
+                <option value="female">
+                    👩 Женщина
+                </option>
+            </select>
+
             <div id="authMessage"></div>
 
-            <button id="authSubmit" class="auth-submit">
+            <button
+                id="authSubmit"
+                class="auth-submit"
+            >
                 Войти
             </button>
 
-            <button id="authClose" class="auth-close">
+            <button
+                id="authClose"
+                class="auth-close"
+            >
                 Закрыть
             </button>
 
         </div>
-    </div>
 
+    </div>
 
     <div class="subtitle">
         Онлайн-видеочат с людьми со всего мира
     </div>
 
-<div class="videos">
+    <div class="videos">
 
-    <div class="video-box">
-        <video id="localVideo" autoplay muted playsinline></video>
+        <div class="video-box">
 
-        <div class="video-controls">
-            <button id="cameraBtn">📹</button>
-            <button id="micBtn">🎤</button>
-            <button id="soundBtn">🔊</button>
-            <button id="flipBtn">🔄</button>
+            <video
+                id="localVideo"
+                autoplay
+                muted
+                playsinline
+            ></video>
+
+            <div class="video-controls">
+
+                <button id="cameraBtn">
+                    📹
+                </button>
+
+                <button id="micBtn">
+                    🎤
+                </button>
+
+                <button id="soundBtn">
+                    🔊
+                </button>
+
+                <button id="flipBtn">
+                    🔄
+                </button>
+
+            </div>
+
         </div>
-    </div>
 
-    <div class="video-box">
-        <video id="remoteVideo" autoplay playsinline></video>
-    </div>
+        <div class="video-box">
 
-</div>
+            <video
+                id="remoteVideo"
+                autoplay
+                playsinline
+            ></video>
+
+        </div>
+
+    </div>
 
     <div class="panel">
 
@@ -339,6 +443,7 @@
         </label>
 
         <select id="countrySelect" disabled>
+
             <option value="RU">🇷🇺 Россия</option>
             <option value="UA">🇺🇦 Украина</option>
             <option value="NL">🇳🇱 Нидерланды</option>
@@ -404,6 +509,7 @@
             <option value="MA">🇲🇦 Марокко</option>
             <option value="NG">🇳🇬 Нигерия</option>
             <option value="KE">🇰🇪 Кения</option>
+
         </select>
 
         <label for="genderSelect">
@@ -411,9 +517,19 @@
         </label>
 
         <select id="genderSelect">
-            <option value="none">Не указывать</option>
-            <option value="male">👨 Мужчина</option>
-            <option value="female">👩 Женщина</option>
+
+            <option value="none">
+                Не указывать
+            </option>
+
+            <option value="male">
+                👨 Мужчина
+            </option>
+
+            <option value="female">
+                👩 Женщина
+            </option>
+
         </select>
 
         <label for="searchCountrySelect">
@@ -421,7 +537,11 @@
         </label>
 
         <select id="searchCountrySelect">
-            <option value="any">🌍 Любая страна</option>
+
+            <option value="any">
+                🌍 Любая страна
+            </option>
+
             <option value="RU">🇷🇺 Россия</option>
             <option value="UA">🇺🇦 Украина</option>
             <option value="NL">🇳🇱 Нидерланды</option>
@@ -487,6 +607,7 @@
             <option value="MA">🇲🇦 Марокко</option>
             <option value="NG">🇳🇬 Нигерия</option>
             <option value="KE">🇰🇪 Кения</option>
+
         </select>
 
         <label for="searchGenderSelect">
@@ -494,10 +615,23 @@
         </label>
 
         <select id="searchGenderSelect">
-            <option value="any">👥 Любой пол</option>
-            <option value="male">👨 Мужчина</option>
-            <option value="female">👩 Женщина</option>
-            <option value="none">Пол не указан</option>
+
+            <option value="any">
+                👥 Любой пол
+            </option>
+
+            <option value="male">
+                👨 Мужчина
+            </option>
+
+            <option value="female">
+                👩 Женщина
+            </option>
+
+            <option value="none">
+                Пол не указан
+            </option>
+
         </select>
 
         <div id="partnerInfo">
@@ -505,17 +639,24 @@
         </div>
 
         <div>
-            <button id="findBtn">
+
+            <button
+                id="findBtn"
+                class="main-button"
+            >
                 🔎 Найти собеседника
             </button>
 
-            <button id="stopBtn">⏹️ Стоп</button>
+            <button
+                id="stopBtn"
+                class="main-button"
+            >
+                ⏹️ Стоп
+            </button>
 
         </div>
 
         <div class="age-warning">
-
-
             🔞 Видеочат Чупа предназначен только для совершеннолетних пользователей.
         </div>
 
@@ -523,24 +664,55 @@
 
 
 <script>
-(function () {
+    /*
+     * Глобальное состояние пользователя.
+     * app.js использует ту же переменную.
+     */
+    var currentUser = null;
 
-    const modal = document.getElementById("authModal");
-    const title = document.getElementById("authTitle");
-    const username = document.getElementById("authUsername");
-    const password = document.getElementById("authPassword");
-    const message = document.getElementById("authMessage");
-    const submit = document.getElementById("authSubmit");
+    const modal =
+        document.getElementById("authModal");
 
-    const loginBtn = document.getElementById("loginBtn");
-    const registerBtn = document.getElementById("registerBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
+    const title =
+        document.getElementById("authTitle");
 
-    const authGuest = document.getElementById("authGuest");
-    const authUser = document.getElementById("authUser");
+    const username =
+        document.getElementById("authUsername");
+
+    const password =
+        document.getElementById("authPassword");
+
+    const authGender =
+        document.getElementById("authGender");
+
+    const message =
+        document.getElementById("authMessage");
+
+    const submit =
+        document.getElementById("authSubmit");
+
+    const loginBtn =
+        document.getElementById("loginBtn");
+
+    const registerBtn =
+        document.getElementById("registerBtn");
+
+    const logoutBtn =
+        document.getElementById("logoutBtn");
+
+    const authGuest =
+        document.getElementById("authGuest");
+
+    const authUser =
+        document.getElementById("authUser");
+
+    const countrySelect =
+        document.getElementById("countrySelect");
+
+    const genderSelect =
+        document.getElementById("genderSelect");
 
     let mode = "login";
-    let currentUser = null;
 
 
     function openAuth(newMode) {
@@ -561,6 +733,13 @@
         password.value = "";
         message.textContent = "";
 
+        authGender.value = "";
+
+        authGender.style.display =
+            mode === "register"
+                ? "block"
+                : "none";
+
         modal.classList.add("active");
 
         username.focus();
@@ -568,6 +747,7 @@
 
 
     function closeAuth() {
+
         modal.classList.remove("active");
     }
 
@@ -586,6 +766,16 @@
             authUser.textContent =
                 "👤 " + currentUser.username;
 
+            if (currentUser.country) {
+                countrySelect.value =
+                    currentUser.country;
+            }
+
+            if (currentUser.gender) {
+                genderSelect.value =
+                    currentUser.gender;
+            }
+
         } else {
 
             authGuest.style.display = "inline";
@@ -602,35 +792,39 @@
 
         try {
 
-            const response = await fetch(
-                "/api/me",
-                {
-                    method: "GET",
-                    credentials: "same-origin"
-                }
-            );
+            const response =
+                await fetch(
+                    "/api/me",
+                    {
+                        method: "GET",
+                        credentials: "same-origin"
+                    }
+                );
 
-            const data = await response.json();
+            const data =
+                await response.json();
 
             if (
                 response.ok &&
                 data.authenticated &&
                 data.user
             ) {
+
                 currentUser = data.user;
 
-                requestUserLocation();
+                updateAuthUI();
 
-                if (countrySelect && currentUser.country) {
-                    countrySelect.value = currentUser.country;
-                }
-
-                if (genderSelect && currentUser.gender) {
-                    genderSelect.value = currentUser.gender;
+                if (
+                    typeof requestUserLocation ===
+                    "function"
+                ) {
+                    requestUserLocation();
                 }
 
             } else {
+
                 currentUser = null;
+                updateAuthUI();
             }
 
         } catch (error) {
@@ -641,9 +835,8 @@
             );
 
             currentUser = null;
+            updateAuthUI();
         }
-
-        updateAuthUI();
     }
 
 
@@ -679,18 +872,22 @@
 
             try {
 
-                const response = await fetch(
-                    "/api/logout",
-                    {
-                        method: "POST",
-                        credentials: "same-origin"
-                    }
-                );
+                const response =
+                    await fetch(
+                        "/api/logout",
+                        {
+                            method: "POST",
+                            credentials: "same-origin"
+                        }
+                    );
 
                 const data =
                     await response.json();
 
-                if (!response.ok || !data.success) {
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
                     throw new Error(
                         data.error ||
                         "Ошибка выхода"
@@ -739,6 +936,17 @@
                 return;
             }
 
+            if (
+                mode === "register" &&
+                !authGender.value
+            ) {
+
+                message.textContent =
+                    "Выберите пол";
+
+                return;
+            }
+
             submit.disabled = true;
 
             message.textContent =
@@ -750,6 +958,23 @@
                     mode === "login"
                         ? "/api/login"
                         : "/api/register";
+
+                const requestData = {
+                    username: name,
+                    password: pass,
+                    country:
+                        countrySelect.value ||
+                        "unknown"
+                };
+
+                /*
+                 * Пол передаём ТОЛЬКО при регистрации.
+                 * После регистрации он берётся из PostgreSQL.
+                 */
+                if (mode === "register") {
+                    requestData.gender =
+                        authGender.value;
+                }
 
                 const response =
                     await fetch(
@@ -765,20 +990,10 @@
                             credentials:
                                 "same-origin",
 
-                            body: JSON.stringify({
-                                username: name,
-                                password: pass,
-                                country:
-                                    document.getElementById(
-                                        "countrySelect"
-                                    )?.value ||
-                                    "unknown",
-                                gender:
-                                    document.getElementById(
-                                        "genderSelect"
-                                    )?.value ||
-                                    "none"
-                            })
+                            body:
+                                JSON.stringify(
+                                    requestData
+                                )
                         }
                     );
 
@@ -789,6 +1004,7 @@
                     !response.ok ||
                     !data.success
                 ) {
+
                     throw new Error(
                         data.error ||
                         "Ошибка сервера"
@@ -798,12 +1014,12 @@
                 currentUser =
                     data.user;
 
+                updateAuthUI();
+
                 message.textContent =
                     mode === "login"
                         ? "Вход выполнен!"
                         : "Регистрация выполнена!";
-
-                updateAuthUI();
 
                 setTimeout(
                     closeAuth,
@@ -811,6 +1027,11 @@
                 );
 
             } catch (error) {
+
+                console.error(
+                    "Ошибка авторизации:",
+                    error
+                );
 
                 message.textContent =
                     error.message ||
@@ -824,14 +1045,25 @@
     );
 
 
+    modal.addEventListener(
+        "click",
+        function (event) {
+
+            if (event.target === modal) {
+                closeAuth();
+            }
+        }
+    );
+
+
+    authGender.style.display = "none";
+
     updateAuthUI();
 
     checkSession();
-
-})();
 </script>
 
-    <script src="app.js"></script>
+<script src="app.js"></script>
 
 </body>
 </html>
