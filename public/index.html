@@ -207,6 +207,129 @@
             z-index: 10;
         }
 
+        .chat-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            max-width: 85vw;
+            height: 100vh;
+            background: rgba(18, 18, 24, 0.98);
+            border-right: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 10px 0 30px rgba(0,0,0,0.35);
+            transform: translateX(-105%);
+            transition: transform 0.25s ease;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .chat-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+            z-index: 999;
+        }
+
+        .sidebar-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .sidebar-close {
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-menu button {
+            width: 100%;
+            min-height: 50px;
+            padding: 12px 14px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .sidebar-menu button:active {
+            transform: scale(0.98);
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            margin: 10px 0;
+        }
+
+        .sidebar-user {
+            padding: 14px;
+            margin-bottom: 15px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .sidebar-user-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .sidebar-user-status {
+            margin-top: 4px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.65);
+            color: #fff;
+            font-size: 25px;
+            cursor: pointer;
+            z-index: 900;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
         .chat-actions {
             display: flex;
             justify-content: center;
@@ -361,6 +484,112 @@
 </head>
 
 <body>
+
+    <button
+        id="sidebarToggle"
+        class="sidebar-toggle"
+        type="button"
+        aria-label="Открыть меню"
+    >
+        ☰
+    </button>
+
+    <div
+        id="sidebarOverlay"
+        class="sidebar-overlay"
+    ></div>
+
+    <aside
+        id="chatSidebar"
+        class="chat-sidebar"
+        aria-hidden="true"
+    >
+        <div class="sidebar-header">
+            <h2>Меню</h2>
+
+            <button
+                id="sidebarClose"
+                class="sidebar-close"
+                type="button"
+                aria-label="Закрыть меню"
+            >
+                ✕
+            </button>
+        </div>
+
+        <div class="sidebar-user">
+            <div
+                id="sidebarUserName"
+                class="sidebar-user-name"
+            >
+                Гость
+            </div>
+
+            <div
+                id="sidebarUserStatus"
+                class="sidebar-user-status"
+            >
+                Войдите в аккаунт
+            </div>
+        </div>
+
+        <div class="sidebar-menu">
+
+            <button
+                id="sidebarLogin"
+                type="button"
+            >
+                🔐 Войти
+            </button>
+
+            <button
+                id="sidebarRegister"
+                type="button"
+            >
+                📝 Регистрация
+            </button>
+
+            <div class="sidebar-divider"></div>
+
+            <button
+                id="sidebarProfile"
+                type="button"
+            >
+                👤 Мой профиль
+            </button>
+
+            <button
+                id="sidebarFriends"
+                type="button"
+            >
+                👥 Друзья
+            </button>
+
+            <button
+                id="sidebarMessages"
+                type="button"
+            >
+                💬 Личные сообщения
+            </button>
+
+            <button
+                id="sidebarSettings"
+                type="button"
+            >
+                ⚙️ Настройки
+            </button>
+
+            <div class="sidebar-divider"></div>
+
+            <button
+                id="sidebarLogout"
+                type="button"
+            >
+                🚪 Выйти
+            </button>
+
+        </div>
+    </aside>
 
     <h1>Видеочат Чупа</h1>
 
@@ -744,6 +973,40 @@
      * app.js использует ту же переменную.
      */
     var currentUser = null;
+
+    const sidebarToggle =
+        document.getElementById("sidebarToggle");
+
+    const sidebarClose =
+        document.getElementById("sidebarClose");
+
+    const sidebarOverlay =
+        document.getElementById("sidebarOverlay");
+
+    const chatSidebar =
+        document.getElementById("chatSidebar");
+
+    function openSidebar() {
+        chatSidebar.classList.add("open");
+        sidebarOverlay.classList.add("open");
+        chatSidebar.setAttribute("aria-hidden", "false");
+    }
+
+    function closeSidebar() {
+        chatSidebar.classList.remove("open");
+        sidebarOverlay.classList.remove("open");
+        chatSidebar.setAttribute("aria-hidden", "true");
+    }
+
+    sidebarToggle.addEventListener("click", openSidebar);
+    sidebarClose.addEventListener("click", closeSidebar);
+    sidebarOverlay.addEventListener("click", closeSidebar);
+
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+            closeSidebar();
+        }
+    });
 
     const modal =
         document.getElementById("authModal");
