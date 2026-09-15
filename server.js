@@ -511,6 +511,35 @@ app.get("/api/health", async (req, res) => {
 
 
 // ======================================================
+// ВРЕМЕННАЯ ПРОВЕРКА ТАБЛИЦ RENDER POSTGRES
+// ======================================================
+
+app.get("/api/debug-db", async (req, res) => {
+    try {
+        const result = await db.query(`
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+            ORDER BY table_name
+        `);
+
+        res.json({
+            database: "ok",
+            tables: result.rows.map(row => row.table_name)
+        });
+
+    } catch (error) {
+        console.error("Ошибка debug-db:", error);
+
+        res.status(500).json({
+            database: "error",
+            error: error.message
+        });
+    }
+});
+
+
+// ======================================================
 // ОЧЕРЕДЬ ВИДЕОЧАТА
 // ======================================================
 
@@ -771,12 +800,37 @@ wss.on("connection", async (ws, request) => {
 
 
 // ======================================================
-// ЗАПУСК
+// ======================================================
+// СОЗДАНИЕ ТАБЛИЦЫ СЕССИЙ
+// ======================================================
+
+async function ensureSessionsTable() {
+    await db.query(`
+        CREATE TABLE IF NOT EXISTS sessions (
+            id BIGSERIAL PRIMARY KEY,
+            token TEXT NOT NULL UNIQUE,
+            user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            expires_at TIMESTAMPTZ NOT NULL,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_sessions_token
+        ON sessions(token);
+
+        CREATE INDEX IF NOT EXISTS idx_sessions_user_id
+        ON sessions(user_id);
+    `);
+
+    console.log("Таблица sessions: готова");
+}// ЗАПУСК
 // ======================================================
 
 const PORT =
     process.env.PORT || 3000;
 
+ensureSessionsTable().catch((error) => {
+    console.error("Ошибка создания таблицы sessions:", error);
+});
 server.listen(
     PORT,
     "0.0.0.0",
