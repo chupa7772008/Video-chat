@@ -1038,6 +1038,27 @@
     const logoutBtn =
         document.getElementById("logoutBtn");
 
+    document
+        .getElementById("sidebarLogin")
+        .addEventListener("click", function () {
+            closeSidebar();
+            loginBtn.click();
+        });
+
+    document
+        .getElementById("sidebarRegister")
+        .addEventListener("click", function () {
+            closeSidebar();
+            registerBtn.click();
+        });
+
+    document
+        .getElementById("sidebarLogout")
+        .addEventListener("click", function () {
+            closeSidebar();
+            logoutBtn.click();
+        });
+
     const authGuest =
         document.getElementById("authGuest");
 
