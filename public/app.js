@@ -305,6 +305,7 @@ async function startCamera() {
         remoteVideo.muted = !soundEnabled;
 
         updateControls();
+status.textContent = "APP.JS ЗАПУЩЕН ✅";
 
         status.textContent =
             "Камера и микрофон включены ✅";
@@ -750,6 +751,7 @@ if (cameraBtn) {
             cameraEnabled;
 
         updateControls();
+status.textContent = "APP.JS ЗАПУЩЕН ✅";
     };
 }
 
@@ -801,6 +803,7 @@ if (micBtn) {
                     "Микрофон включен ✅";
 
                 updateControls();
+status.textContent = "APP.JS ЗАПУЩЕН ✅";
 
             } catch (error) {
                 console.error(
@@ -826,6 +829,7 @@ if (micBtn) {
             micEnabled;
 
         updateControls();
+status.textContent = "APP.JS ЗАПУЩЕН ✅";
     };
 }
 
@@ -838,6 +842,7 @@ if (soundBtn) {
             !soundEnabled;
 
         updateControls();
+status.textContent = "APP.JS ЗАПУЩЕН ✅";
 
         if (soundEnabled) {
             remoteVideo.play().catch(() => {});
@@ -915,6 +920,7 @@ async function flipCamera() {
             newFacingMode;
 
         updateControls();
+status.textContent = "APP.JS ЗАПУЩЕН ✅";
 
         if (currentFacingMode === "user") {
             status.textContent =
@@ -942,6 +948,7 @@ if (flipBtn) {
 }
 
 updateControls();
+status.textContent = "APP.JS ЗАПУЩЕН ✅";
 
 startCamera();
 connectSocket();
