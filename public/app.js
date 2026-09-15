@@ -8,6 +8,7 @@ const countrySelect = document.getElementById("countrySelect");
 const genderSelect = document.getElementById("genderSelect");
 const searchCountrySelect = document.getElementById("searchCountrySelect");
 const searchGenderSelect = document.getElementById("searchGenderSelect");
+status.textContent = "APP.JS СТАРТОВАЛ ✅";
 
 function requestUserLocation() {
 
