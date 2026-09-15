@@ -1063,8 +1063,9 @@
     checkSession();
 </script>
 
-<script>window.addEventListener("error",function(e){var s=document.getElementById("status");if(s)s.textContent="JS ОШИБКА: "+e.message+" | строка "+e.lineno+" ❌";console.error(e.message,e.filename,e.lineno,e.colno);});window.addEventListener("unhandledrejection",function(e){var s=document.getElementById("status");if(s)s.textContent="JS PROMISE ОШИБКА: "+(e.reason&&e.reason.message?e.reason.message:e.reason)+" ❌";console.error(e.reason);});</script>
-<script src="app.js" onload="document.getElementById('status').textContent=window.__APP_JS_STARTED__ ? 'APP.JS ВЫПОЛНЯЕТСЯ ✅' : 'APP.JS НЕ ВЫПОЛНЯЕТСЯ ❌'" onerror="document.getElementById('status').textContent='APP.JS НЕ ЗАГРУЖЕН ❌'"></script>
+<script>window.addEventListener("error",function(e){window.__APP_ERROR__=e.message+" | строка "+e.lineno+" | колонка "+e.colno;var s=document.getElementById("status");if(s)s.textContent="JS ОШИБКА: "+e.message+" | строка "+e.lineno+" ❌";console.error(e.message,e.filename,e.lineno,e.colno);});window.addEventListener("unhandledrejection",function(e){var s=document.getElementById("status");if(s)s.textContent="JS PROMISE ОШИБКА: "+(e.reason&&e.reason.message?e.reason.message:e.reason)+" ❌";console.error(e.reason);});</script>
+<script>window.__APP_ERROR__="";window.addEventListener("error",function(e){window.__APP_ERROR__=e.message+" | строка "+e.lineno+" | колонка "+e.colno});window.addEventListener("unhandledrejection",function(e){window.__APP_ERROR__="PROMISE: "+(e.reason&&e.reason.message?e.reason.message:e.reason)});</script>
+<script src="app.js"></script>
 
 
 
