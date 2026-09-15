@@ -151,18 +151,28 @@
         }
 
         .videos {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
+            position: relative;
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
             padding: 10px;
+            box-sizing: border-box;
         }
 
         .video-box {
             position: relative;
-            width: 45%;
-            max-width: 600px;
-            min-width: 300px;
+        }
+
+        .video-box:first-child {
+            position: absolute;
+            width: 230px;
+            right: 25px;
+            top: 25px;
+            z-index: 5;
+        }
+
+        .video-box:last-child {
+            width: 100%;
         }
 
         video {
@@ -171,18 +181,24 @@
             aspect-ratio: 16 / 9;
             object-fit: cover;
             background: #000;
-            border-radius: 12px;
+            border-radius: 14px;
             border: 2px solid #333;
+        }
+
+        .video-box:first-child video {
+            border-radius: 12px;
+            border: 2px solid #fff;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
 
         .video-controls {
             position: absolute;
             left: 0;
             right: 0;
-            bottom: 12px;
+            bottom: 10px;
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 7px;
             z-index: 10;
         }
 
@@ -276,9 +292,25 @@
         }
 
         @media (max-width: 700px) {
-            .video-box {
-                width: 100%;
-                min-width: 0;
+            .videos {
+                padding: 5px;
+            }
+
+            .video-box:first-child {
+                width: 125px;
+                right: 15px;
+                top: 15px;
+            }
+
+            .video-controls {
+                bottom: 7px;
+                gap: 4px;
+            }
+
+            .video-controls button {
+                width: 38px;
+                height: 38px;
+                font-size: 18px;
             }
 
             h1 {
